@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MonuDex — Collect the world's monuments</title>
+<meta name="description" content="MonuDex turns travel into a collection game. Discover 585 iconic monuments across 195 countries, verify your visits on location, and build your personal atlas of the world." />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<link rel="apple-touch-icon" href="assets/icon.png" />
+<meta property="og:title" content="MonuDex — Collect the world's monuments" />
+<meta property="og:description" content="Discover 585 iconic monuments across 195 countries. Visit. Verify. Collect." />
+<meta property="og:image" content="assets/ad/ad-16x9.png" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="assets/ad/ad-16x9.png" />
+<style>
+.g-tip{background:rgba(7,11,22,.92);color:#fff;padding:6px 10px;border-radius:8px;font-family:'Hanken Grotesk',sans-serif;font-size:12px;line-height:1.3}
+.g-tip b{font-weight:800}.g-tip span{display:block;color:#90a0b4;font-size:10.5px}
+.globe-frame{display:grid;place-items:center;height:100%}
+</style>
+</head>
+<body>
+<div class="topbar">🌍 585 monuments · 195 countries — your world is waiting. <a href="index.html#get">Get early access →</a></div>
+<nav class="nav"><div class="wrap nav-in">
+  <a class="brand" href="index.html"><img class="mark" src="assets/logo.svg" alt="MonuDex logo" width="30" height="30"> MonuDex</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="explore.html">Explore globe</a>
+    <a href="how-it-works.html">How it works</a>
+  </div>
+  <a class="btn btn-accent nav-cta" href="#get">Get the app</a>
+  <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</div></nav>
+
+<header class="hero"><div class="wrap hero-grid">
+  <div class="hero-copy">
+    <span class="badge"><span class="badge-dot"></span> For travelers &amp; tourists</span>
+    <h1>Collect the <span class="grad">world</span>, one landmark at a time.</h1>
+    <p>MonuDex turns every trip into a collection. Discover iconic monuments, prove you were really there, and build your personal atlas of the planet.</p>
+    <div class="hero-cta">
+      <a class="btn btn-accent" href="#get">↓ Get the app</a>
+      <a class="btn btn-light" href="explore.html">Explore the globe →</a>
+    </div>
+    <div class="hero-trust"><span class="stars">★★★★★</span> Loved by travelers in 195 countries</div>
+    <div class="hero-stats">
+      <div><b data-count="585">0</b><span>Monuments</span></div>
+      <div><b data-count="195">0</b><span>Countries</span></div>
+      <div><b data-count="6">0</b><span>Continents</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-glow"></div>
+    <div id="heroGlobe"></div>
+  </div>
+</div></header>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Why MonuDex</div>
+      <h2>Travel with a purpose</h2>
+      <p>A playful, beautiful way to remember where you've been — and discover where to go next.</p>
+    </div>
+    <div class="grid4 reveal d1">
+      <div class="card"><div class="ico">🗺️</div><h3>Discover</h3><p>585 hand-picked monuments across every country, from world wonders to hidden gems.</p></div>
+      <div class="card"><div class="ico">📍</div><h3>Verify on location</h3><p>Get within range and capture a selfie to prove you really visited — no faking it.</p></div>
+      <div class="card"><div class="ico">🏛️</div><h3>Collect &amp; level up</h3><p>Unlock detailed cards, earn rarities and badges, and complete countries and continents.</p></div>
+      <div class="card"><div class="ico">🌍</div><h3>Plan your next trip</h3><p>Spin the interactive globe to see what's nearby and what's still missing from your atlas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Bucket list</div>
+      <h2>Featured destinations</h2>
+      <p>A taste of the 585 landmarks waiting in your atlas — from world wonders to local icons.</p>
+    </div>
+    <div class="dest-grid reveal" id="destGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">The app</div>
+      <h2>Designed for the journey</h2>
+      <p>Clean, fast, and built around real photos of every monument.</p>
+    </div>
+    <div class="mocks reveal">
+      <!-- Collection -->
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="s-top"><span class="dot"></span> MonuDex</div>
+        <div class="s-sub">11 of 585 collected worldwide</div>
+        <div class="s-grid" id="mockGrid"></div>
+        <div class="s-tab"><span class="on">Home</span><span>Camera</span><span>Map</span><span>MonuDex</span><span>Me</span></div>
+      </div></div>
+      <!-- Globe -->
+      <div class="phone lift"><div class="screen"><div class="notch"></div>
+        <div class="s-top"><span class="dot"></span> Explore</div>
+        <div class="s-globe"><div class="globe-frame"><div id="mockGlobeCircle" style="width:230px;height:230px;border-radius:50%;background-size:cover;background-position:center;box-shadow:0 0 60px rgba(40,120,220,.35), inset -18px -18px 50px rgba(0,0,0,.55)"></div></div></div>
+        <div class="s-tab"><span>Home</span><span>Camera</span><span class="on">Map</span><span>MonuDex</span><span>Me</span></div>
+      </div></div>
+      <!-- Detail -->
+      <div class="phone"><div class="screen"><div class="notch"></div>
+        <div class="s-hero-img" id="mockDetailImg"></div>
+        <div class="s-detail">
+          <div class="t" id="mockDetailName">Taj Mahal</div>
+          <div class="c" id="mockDetailCountry">Agra · India</div>
+          <div class="d">An ivory-white marble mausoleum on the Yamuna river — one of the most recognizable monuments on Earth and a UNESCO World Heritage Site.</div>
+        </div>
+        <div class="s-btn">◉ Unlock with selfie</div>
+        <div class="s-tab"><span>Home</span><span>Camera</span><span>Map</span><span class="on">MonuDex</span><span>Me</span></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="watch">
+  <div class="wrap">
+    <div class="section-head reveal"><div class="eyebrow">Watch</div><h2>See MonuDex in action</h2><p>A quick tour of collecting the world, one landmark at a time.</p></div>
+    <div class="reveal" style="max-width:920px;margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)">
+      <video src="assets/ad/monudex-ad.mp4" poster="assets/ad/ad-16x9.png" controls autoplay muted loop playsinline style="width:100%;display:block;background:#000"></video>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal"><div class="eyebrow">How it works</div><h2>Visit. Verify. Collect.</h2></div>
+    <div class="steps reveal d1">
+      <div class="step"><h3>Find a monument</h3><p>Browse the globe or your nearby list to pick your next landmark.</p></div>
+      <div class="step"><h3>Prove you're there</h3><p>Get within range and snap a selfie — MonuDex confirms the landmark is in frame.</p></div>
+      <div class="step"><h3>Add it to your atlas</h3><p>Unlock the card, climb the leaderboard, and watch your world fill in.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Loved by travelers</div>
+      <h2>Adventures, collected</h2>
+      <p>Join explorers turning every trip into a story worth keeping.</p>
+    </div>
+    <div class="quotes">
+      <div class="quote reveal">
+        <div class="stars">★★★★★</div>
+        <p>"It completely changed how I travel. I plan whole weekend trips around unlocking the next monument."</p>
+        <div class="who"><div class="av" style="background:#0E9F6E">M</div><div><div class="nm">Maya R.</div><div class="rl">City breaker · 47 collected</div></div></div>
+      </div>
+      <div class="quote reveal d1">
+        <div class="stars">★★★★★</div>
+        <p>"The selfie verification makes it feel earned. My atlas is basically a map of my best memories now."</p>
+        <div class="who"><div class="av" style="background:#3B82F6">L</div><div><div class="nm">Liam T.</div><div class="rl">Backpacker · 112 collected</div></div></div>
+      </div>
+      <div class="quote reveal d2">
+        <div class="stars">★★★★★</div>
+        <p>"We use it as a family on road trips. The kids race to find the next landmark — it's brilliant."</p>
+        <div class="who"><div class="av" style="background:#C8932A">S</div><div><div class="nm">Sofia &amp; Co.</div><div class="rl">Road-trippers · 28 collected</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="get">
+  <div class="wrap"><div class="band reveal">
+    <h2>Your next adventure is waiting</h2>
+    <p>Start your collection today and turn every trip into a story worth keeping.</p>
+    <div class="hero-cta" style="justify-content:center">
+      <a class="btn btn-accent" href="#">Download for iOS</a>
+      <a class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" href="explore.html">Explore the globe</a>
+    </div>
+  </div></div>
+</section>
+
+<footer><div class="wrap foot-in">
+  <div class="brand"><img class="mark" src="assets/logo.svg" alt="" width="26" height="26"> MonuDex</div>
+  <div class="foot-links"><a href="index.html">Home</a><a href="explore.html">Explore</a><a href="how-it-works.html">How it works</a></div>
+  <div class="muted">© 2026 MonuDex · Photos via Wikimedia Commons</div>
+</div></footer>
+
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
+<script src="js/globe.js"></script>
+<script src="js/site.js"></script>
+<script>
+(async function(){
+  const mons = await loadMonuments();
+  makeGlobe(document.getElementById('heroGlobe'), mons, {
+    autoRotate:true, altitude:2.5, pointRadius:0.28,
+    onPin:(m)=>window.showMonument && window.showMonument(m)
+  });
+
+  // featured destinations showcase (real photos)
+  const featured = [
+    ['Taj Mahal','legendary'],['Colosseum','legendary'],['Machu Picchu','legendary'],['Petra','legendary'],
+    ['Great Wall of China','legendary'],['Christ the Redeemer','epic'],['Sydney Opera House','epic'],['Eiffel Tower','legendary']
+  ];
+  const findM = n => mons.find(m=>m.name===n) || mons.find(m=>m.name.includes(n));
+  const dg = document.getElementById('destGrid');
+  if (dg) featured.forEach(([nm,rar])=>{ const m=findM(nm); if(!m) return;
+    const card=document.createElement('div');
+    card.className='dest'; card.style.cursor='pointer';
+    card.innerHTML=`<span class="rar ${rar==='legendary'?'leg':''}">${rar}</span>
+      <img loading="lazy" src="${m.photo}" alt="${m.name}">
+      <div class="cap"><b>${m.name}</b><span>${m.country}</span></div>`;
+    card.addEventListener('click',()=>window.showMonument&&window.showMonument(m));
+    dg.appendChild(card);
+  });
+
+  // mockup: globe circle uses the earth texture
+  document.getElementById('mockGlobeCircle').style.backgroundImage =
+    "url('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')";
+
+  const byName = n => mons.find(m => m.name === n) || mons.find(m => m.name.includes(n));
+  // detail mockup = Taj Mahal
+  const taj = byName('Taj Mahal');
+  if (taj){ document.getElementById('mockDetailImg').style.backgroundImage=`url('${taj.photo}')`;
+    document.getElementById('mockDetailName').textContent=taj.name;
+    document.getElementById('mockDetailCountry').textContent=taj.country; }
+  // collection grid mockup
+  const picks = ['Eiffel Tower','Colosseum','Statue of Liberty','Christ the Redeemer','Great Wall of China','Sydney Opera House'];
+  const grid = document.getElementById('mockGrid');
+  picks.forEach((nm,i)=>{ const m=byName(nm); if(!m) return;
+    const locked = i>2;
+    grid.insertAdjacentHTML('beforeend',
+      `<div class="s-card"><div class="ph" style="background-image:url('${m.photo}')">${locked?'<div class="lk">🔒</div>':''}</div>
+       <div class="nm">${m.name}</div><div class="lo">${m.country}</div></div>`);
+  });
+})();
+</script>
+</body>
+</html>

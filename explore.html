@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Explore the globe — MonuDex</title>
+<meta name="description" content="Spin an interactive 3D globe of 585 monuments across 195 countries. Search, browse, and discover landmarks for your next trip." />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<style>
+.g-tip{background:rgba(7,11,22,.92);color:#fff;padding:6px 10px;border-radius:8px;font-family:'Hanken Grotesk',sans-serif;font-size:12px;line-height:1.3}
+.g-tip b{font-weight:800}.g-tip span{display:block;color:#90a0b4;font-size:10.5px}
+</style>
+</head>
+<body>
+<div class="topbar">🌍 585 monuments · 195 countries — your world is waiting. <a href="index.html#get">Get early access →</a></div>
+<nav class="nav"><div class="wrap nav-in">
+  <a class="brand" href="index.html"><img class="mark" src="assets/logo.svg" alt="MonuDex logo" width="30" height="30"> MonuDex</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="explore.html" class="active">Explore globe</a>
+    <a href="how-it-works.html">How it works</a>
+  </div>
+  <a class="btn btn-accent nav-cta" href="index.html#get">Get the app</a>
+  <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</div></nav>
+<script src="js/site.js" defer></script>
+
+<div class="explore">
+  <div id="exploreGlobe"></div>
+  <aside class="panel">
+    <div class="panel-head">
+      <div class="eyebrow">Explore</div>
+      <h2 style="font-size:24px;margin-top:4px">585 monuments</h2>
+      <div class="muted" style="font-size:13px;font-weight:600">Spin the globe or search below · tap a pin for details</div>
+      <input class="search" id="search" placeholder="Search monument or country…" />
+    </div>
+    <div class="detailcard" id="detail">
+      <div class="big" id="dBig"></div>
+      <div class="body">
+        <div class="cat" id="dCat" style="color:var(--accent-d);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em"></div>
+        <h3 id="dName" style="margin:4px 0 2px"></h3>
+        <div class="muted" id="dCountry" style="font-weight:600;font-size:13px"></div>
+      </div>
+    </div>
+    <div class="results" id="results"></div>
+  </aside>
+</div>
+
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
+<script src="js/globe.js"></script>
+<script>
+(async function(){
+  const mons = await loadMonuments();
+  const detail = document.getElementById('detail');
+  function showDetail(m){
+    document.getElementById('dBig').style.backgroundImage=`url('${m.photo}')`;
+    document.getElementById('dBig').style.cssText+=';background-size:cover;background-position:center';
+    document.getElementById('dCat').textContent=m.category||'';
+    document.getElementById('dName').textContent=m.name;
+    document.getElementById('dCountry').textContent=m.country;
+    detail.classList.add('show');
+  }
+  const globe = makeGlobe(document.getElementById('exploreGlobe'), mons, {
+    autoRotate:true, autoRotateSpeed:0.35, altitude:2.2, pointRadius:0.3,
+    onPin:(m)=>{ showDetail(m); if(window.showMonument)window.showMonument(m); globe.pointOfView({lat:m.lat,lng:m.lng,altitude:1.6},800); }
+  });
+
+  const results = document.getElementById('results');
+  function render(list){
+    results.innerHTML = list.slice(0,300).map(m=>`
+      <div class="res" data-id="${m.id}">
+        <div class="ph" style="background-image:url('${m.photo}')"></div>
+        <div><div class="cat">${m.category||''}</div><div class="nm">${m.name}</div><div class="lo">${m.country}</div></div>
+      </div>`).join('');
+    results.querySelectorAll('.res').forEach(el=>el.addEventListener('click',()=>{
+      const m=mons.find(x=>x.id===el.dataset.id); showDetail(m);
+      if(window.showMonument)window.showMonument(m);
+      globe.pointOfView({lat:m.lat,lng:m.lng,altitude:1.6},900);
+    }));
+  }
+  const sorted=[...mons].sort((a,b)=>a.country.localeCompare(b.country)||a.name.localeCompare(b.name));
+  render(sorted);
+  document.getElementById('search').addEventListener('input',e=>{
+    const q=e.target.value.toLowerCase().trim();
+    render(q? sorted.filter(m=>(m.name+' '+m.country).toLowerCase().includes(q)) : sorted);
+  });
+})();
+</script>
+</body>
+</html>
