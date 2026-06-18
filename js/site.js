@@ -45,7 +45,10 @@
       '<div class="modal-body">' +
         '<div class="modal-cat"></div><div class="modal-name"></div><div class="modal-loc"></div>' +
         '<p class="modal-desc"></p>' +
-        '<a class="btn btn-accent" href="explore.html">Explore on the globe →</a>' +
+        '<div class="modal-actions">' +
+          '<a class="btn btn-accent modal-wiki" target="_blank" rel="noopener noreferrer">Read more on Wikipedia ↗</a>' +
+          '<a class="btn btn-ghost modal-maps" target="_blank" rel="noopener noreferrer">View on map ↗</a>' +
+        '</div>' +
       '</div>' +
     '</div>';
   document.body.appendChild(modal);
@@ -72,6 +75,16 @@
     modal.querySelector('.modal-loc').textContent = '📍 ' + m.country;
     modal.querySelector('.modal-desc').textContent =
       `${m.name} is a ${(m.category || 'landmark').toLowerCase()} in ${m.country} — one of 585 monuments to discover, visit, and collect in MonuDex.`;
+    // Wikipedia "Go" jumps straight to the article when the title matches, else shows results.
+    modal.querySelector('.modal-wiki').href =
+      'https://en.wikipedia.org/wiki/Special:Search?go=Go&search=' + encodeURIComponent(m.name);
+    const maps = modal.querySelector('.modal-maps');
+    if (typeof m.lat === 'number' && typeof m.lng === 'number') {
+      maps.style.display = '';
+      maps.href = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
+    } else {
+      maps.style.display = 'none';
+    }
     modal.classList.add('open');
   };
 })();
