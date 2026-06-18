@@ -243,3 +243,24 @@ footer{border-top:1px solid var(--line);padding:46px 0;color:var(--ink3);font-si
 .hero-glow{position:absolute;width:74%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(25,213,140,.30),transparent 62%);pointer-events:none}
 #heroGlobe{position:relative;width:100%;max-width:500px;height:460px;margin:0 auto;overflow:hidden}
 @media(max-width:860px){.hero-visual{min-height:340px}.hero-copy{margin-inline:auto}#heroGlobe{height:340px}}
+
+/* ===== round 4: premium floating glass header ===== */
+.topbar{font-size:12.5px;padding:8px 16px}
+.nav{position:sticky;top:12px;z-index:50;margin:12px auto 0;width:calc(100% - 28px);max-width:1180px;border-radius:18px;
+  background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 40px rgba(16,20,24,.10)}
+.nav.scrolled{box-shadow:0 16px 48px rgba(16,20,24,.16)}
+.nav-in{display:flex;align-items:center;gap:16px;height:62px;max-width:none;padding:0 12px 0 18px;position:relative}
+.nav-links{flex:1;justify-content:center;gap:4px}
+.nav-cta{margin-left:0}
+.nav .btn-accent{padding:11px 19px;font-size:14.5px}
+@media(max-width:760px){
+  .nav{top:8px;margin-top:8px;width:calc(100% - 20px)}
+  .nav-in{padding:0 8px 0 16px}
+  .nav-cta{display:none}
+  .nav-links{position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;gap:2px;
+    background:rgba(255,255,255,.97);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    border:1px solid var(--line);border-radius:16px;padding:8px;display:none;box-shadow:0 14px 34px rgba(16,20,24,.14)}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:12px 16px;border-radius:10px}
+}
