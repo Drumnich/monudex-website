@@ -22,8 +22,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Sora:wght@400;500;600;700;800&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="./vendor/three.min.js"></script>
-<script src="./vendor/globe.gl.min.js"></script>
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
 <style>
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -686,8 +686,8 @@ class Component extends DCLogic {
     this.exploreEl=React.createRef(); this.videoEl=React.createRef(); this.starCanvas=React.createRef();
     this._globe=null; this._exGlobe=null; this._io=null;
     this._lastDir=d; this._lastPage='home';
-    this.EARTH='./vendor/earth-blue-marble.jpg';
-    this.TOPO='./vendor/earth-topology.png';
+    this.EARTH='https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
+    this.TOPO='https://unpkg.com/three-globe/example/img/earth-topology.png';
     this.LEGENDARY=new Set(['Taj Mahal','Colosseum','Great Wall of China','Christ the Redeemer','Eiffel Tower','Statue of Liberty','Angkor Wat','Petra','Machu Picchu','Sydney Opera House','Forbidden City, Beijing','Terracotta Army, Xi’an','Moai of Rapa Nui / Easter Island','Charles Bridge, Prague','Schönbrunn Palace','Tiger\u2019s Nest Monastery (Paro Taktsang)','Salar de Uyuni','Stari Most, Mostar','Plitvice Lakes National Park','Grand-Place, Brussels']);
     this.FEATURED=['Taj Mahal','Colosseum','Great Wall of China','Christ the Redeemer','Eiffel Tower','Angkor Wat','Sydney Opera House','Petra','Moai of Rapa Nui / Easter Island','Tiger\u2019s Nest Monastery (Paro Taktsang)','Terracotta Army, Xi’an','Charles Bridge, Prague'];
     this.FAQ_DATA=[
