@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="MonuDex">
+  <defs>
+    <linearGradient id="mdmark" x1="14" y1="4" x2="50" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1BE39A"></stop>
+      <stop offset="1" stop-color="#0B8159"></stop>
+    </linearGradient>
+    <clipPath id="mdhead"><circle cx="32" cy="27" r="21"></circle></clipPath>
+  </defs>
+  <path d="M32 4 C44.7 4 55 14.3 55 27 C55 41.2 40.6 54.4 34.4 59.7 a3.7 3.7 0 0 1 -4.8 0 C23.4 54.4 9 41.2 9 27 C9 14.3 19.3 4 32 4 Z" fill="url(#mdmark)"></path>
+  <g clip-path="url(#mdhead)" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round">
+    <line x1="9" y1="27" x2="55" y2="27"></line>
+    <ellipse cx="32" cy="27" rx="8.6" ry="21"></ellipse>
+  </g>
+  <circle cx="32" cy="27" r="3.3" fill="#fff"></circle>
+</svg>
