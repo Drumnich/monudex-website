@@ -25,6 +25,7 @@
     globeInteracting: false,
     cameraTransitionUntil: 0,
     orbitFrame: null,
+    cloudLayer: null,
   };
 
   const refreshIcons = () => window.MonuDexSite?.refreshIcons();
@@ -340,6 +341,9 @@
     function orbit(now) {
       const elapsed = Math.min(50, now - lastFrame);
       lastFrame = now;
+      if (state.rotationEnabled && state.cloudLayer) {
+        state.cloudLayer.rotation.y -= elapsed * 0.000006;
+      }
       if (state.rotationEnabled && !state.globeInteracting && now >= state.cameraTransitionUntil) {
         const view = globe.pointOfView();
         const lng = ((Number(view.lng) - elapsed * 0.0022 + 540) % 360) - 180;
@@ -349,6 +353,73 @@
     }
     cancelAnimationFrame(state.orbitFrame);
     state.orbitFrame = requestAnimationFrame(orbit);
+  }
+
+  function loadThreeTexture(globe, url, TextureClass) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.addEventListener("load", () => {
+        const texture = new TextureClass(image);
+        texture.anisotropy = Math.min(8, globe.renderer().capabilities.getMaxAnisotropy());
+        texture.needsUpdate = true;
+        resolve(texture);
+      }, { once: true });
+      image.addEventListener("error", reject, { once: true });
+      image.src = url;
+    });
+  }
+
+  async function enhance3DGlobe(globe) {
+    const surfaceMaterial = globe.globeMaterial();
+    const TextureClass = surfaceMaterial.map?.constructor;
+    if (!TextureClass) return;
+
+    const [normalTexture, specularTexture, cloudTexture] = await Promise.all([
+      loadThreeTexture(globe, "assets/globe/earth-normal.jpg", TextureClass).catch(() => null),
+      loadThreeTexture(globe, "assets/globe/earth-specular.jpg", TextureClass).catch(() => null),
+      loadThreeTexture(globe, "assets/globe/earth-clouds.png", TextureClass).catch(() => null),
+    ]);
+
+    if (normalTexture) {
+      surfaceMaterial.normalMap = normalTexture;
+      surfaceMaterial.normalScale?.set(0.78, 0.78);
+    }
+    if (specularTexture) {
+      surfaceMaterial.specularMap = specularTexture;
+      surfaceMaterial.specular?.set("#7EAFC4");
+      surfaceMaterial.shininess = 22;
+    }
+    surfaceMaterial.bumpScale = 4.5;
+    surfaceMaterial.needsUpdate = true;
+
+    if (!cloudTexture || state.cloudLayer) return;
+    let surfaceMesh = null;
+    globe.scene().traverse((object) => {
+      if (!surfaceMesh && object.isMesh && object.material === surfaceMaterial) surfaceMesh = object;
+    });
+    if (!surfaceMesh?.geometry?.clone || !surfaceMesh.parent) return;
+
+    const cloudGeometry = surfaceMesh.geometry.clone();
+    cloudGeometry.scale(1.0035, 1.0035, 1.0035);
+    const CloudMaterial = surfaceMaterial.constructor;
+    const cloudMaterial = new CloudMaterial({
+      map: cloudTexture,
+      color: "#F4FAFF",
+      transparent: true,
+      opacity: 0.36,
+      depthWrite: false,
+      alphaTest: 0.015,
+    });
+    const CloudMesh = surfaceMesh.constructor;
+    const cloudLayer = new CloudMesh(cloudGeometry, cloudMaterial);
+    cloudLayer.name = "monudex-cloud-layer";
+    cloudLayer.position.copy(surfaceMesh.position);
+    cloudLayer.quaternion.copy(surfaceMesh.quaternion);
+    cloudLayer.scale.copy(surfaceMesh.scale);
+    surfaceMesh.parent.add(cloudLayer);
+    state.cloudLayer = cloudLayer;
+    els.globe.dataset.cloudLayer = "true";
   }
 
   function init3DGlobe() {
@@ -363,13 +434,13 @@
         .bumpImageUrl("assets/earth-topology.png")
         .backgroundColor("rgba(0,0,0,0)")
         .showAtmosphere(true)
-        .atmosphereColor("#0E9F6E")
-        .atmosphereAltitude(0.18)
+        .atmosphereColor("#79CFFF")
+        .atmosphereAltitude(0.16)
         .pointsData(state.monuments)
         .pointLat("lat")
         .pointLng("lng")
         .pointColor(() => "#18D294")
-        .pointAltitude(0.004)
+        .pointAltitude(0.006)
         .pointRadius(0.22)
         .pointResolution(6)
         .pointsTransitionDuration(0)
@@ -396,6 +467,7 @@
         .onGlobeReady(() => {
           els.globe.dataset.mode = "3d";
           els.loading.classList.add("is-ready");
+          enhance3DGlobe(globe).catch((error) => console.warn("Advanced globe textures unavailable", error));
         });
 
       state.globe = globe;
