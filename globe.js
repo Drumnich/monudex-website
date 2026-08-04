@@ -477,7 +477,7 @@
       controls.enablePan = false;
       controls.minDistance = 150;
       controls.maxDistance = 520;
-      globe.pointOfView({ lat: 18, lng: 10, altitude: 2.15 });
+      globe.pointOfView({ lat: 18, lng: 10, altitude: 2.28 });
 
       const size = () => {
         const rect = els.stage.getBoundingClientRect();
