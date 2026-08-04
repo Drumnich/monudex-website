@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Monument Unlocks Work | MonuDex</title>
+  <meta name="description" content="See how MonuDex combines an in-app photo, monument recognition, and precise location to verify a real-world monument visit.">
+  <meta name="theme-color" content="#0E1113">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
+  <link rel="apple-touch-icon" href="assets/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="assets/vendor/lucide.min.js" defer></script>
+  <script src="site.js" defer></script>
+</head>
+<body data-page="how">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" data-header>
+    <a class="brand" href="index.html" aria-label="MonuDex home"><img src="assets/logo-mark.svg" alt="" width="36" height="36"><span>MonuDex</span></a>
+    <button class="icon-button menu-button" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button><i data-lucide="menu" aria-hidden="true"></i></button>
+    <nav class="site-nav" aria-label="Primary navigation" data-nav>
+      <a href="index.html">Globe</a><a href="explore.html">Collection</a><a href="how-it-works.html" aria-current="page">How it works</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a class="nav-cta" href="mailto:hello@monudex.app?subject=MonuDex%20beta%20access">Request beta access</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="page-hero process-hero" aria-labelledby="page-title">
+      <div class="page-shell page-hero-content">
+        <p class="app-eyebrow"><span></span> Verification flow</p>
+        <h1 id="page-title">Find it. Face it.<br>Unlock it.</h1>
+        <p>A MonuDex unlock connects what the camera sees with where the device is, so the collection reflects real travel.</p>
+      </div>
+    </section>
+
+    <section class="how-section page-shell" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <div><p class="app-eyebrow"><span></span> Three checks</p><h2 id="steps-title">From nearby<br>to collected.</h2></div>
+        <p>The camera and location requests happen only when they are needed for an unlock attempt.</p>
+      </div>
+      <ol class="step-list">
+        <li><span class="step-number">01</span><div class="step-icon"><i data-lucide="navigation" aria-hidden="true"></i></div><h3>Get close</h3><p>Reach the verified area around the monument, generally within one to two kilometres of its coordinates.</p></li>
+        <li><span class="step-number">02</span><div class="step-icon"><i data-lucide="camera" aria-hidden="true"></i></div><h3>Take the photo</h3><p>Use the in-app camera to frame yourself and the monument together. Existing gallery images are not accepted for a new unlock.</p></li>
+        <li><span class="step-number">03</span><div class="step-icon"><i data-lucide="badge-check" aria-hidden="true"></i></div><h3>Verify and collect</h3><p>The image and precise location must both match before the monument joins your MonuDex.</p></li>
+      </ol>
+    </section>
+
+    <section class="verification-section" aria-labelledby="detector-title">
+      <div class="page-shell verification-layout">
+        <div class="verification-copy">
+          <p class="app-eyebrow"><span></span> In-app detector</p>
+          <h2 id="detector-title">One camera.<br>Two signals.</h2>
+          <p class="verification-intro">Image recognition estimates whether the selected monument is visible. Location verification independently checks the device's distance from the catalogue coordinates.</p>
+          <div class="proof-list">
+            <div><i data-lucide="scan-face" aria-hidden="true"></i><p><strong>Live capture</strong><span>The attempt starts inside the app camera.</span></p></div>
+            <div><i data-lucide="scan-search" aria-hidden="true"></i><p><strong>Visual confidence</strong><span>The detector must recognize the monument in the image.</span></p></div>
+            <div><i data-lucide="map-pin-check" aria-hidden="true"></i><p><strong>Distance confidence</strong><span>Precise coordinates must fall inside the unlock range.</span></p></div>
+          </div>
+        </div>
+        <figure class="app-figure"><div class="phone-frame"><div class="phone-island" aria-hidden="true"></div><img src="assets/app-detector.png" alt="MonuDex detector screen checking the Eiffel Tower"></div><figcaption>Detector camera · iOS development build</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="faq-section page-shell" aria-labelledby="faq-title">
+      <div class="section-heading compact-heading"><div><p class="app-eyebrow"><span></span> Important details</p><h2 id="faq-title">Before you unlock.</h2></div><p>Safety and local access rules always come before completing a collection.</p></div>
+      <div class="faq-list">
+        <details open><summary>Why does MonuDex need precise location?</summary><p>Approximate location is not accurate enough to distinguish a genuine visit from a remote attempt. Precise location is used to calculate distance from the monument during verification.</p></details>
+        <details><summary>What happens when recognition is uncertain?</summary><p>The unlock is not awarded. The user can retake the photo with the monument more clearly visible or try again from a better public viewpoint.</p></details>
+        <details><summary>Does MonuDex require unsafe access?</summary><p>No. Users must remain in lawful public areas, respect closures and site rules, and never climb, trespass, obstruct traffic, or enter a dangerous position for an unlock.</p></details>
+        <details><summary>How is photo and location data handled?</summary><p>Verification data is limited to the product purpose described in the Privacy Policy. Users can review permission choices at any time in iOS Settings.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="page-shell footer-main"><a class="brand footer-brand" href="index.html" aria-label="MonuDex home"><img src="assets/logo-mark.svg" alt="" width="38" height="38"><span>MonuDex</span></a><p>Collect the world in person.</p><nav aria-label="Footer navigation"><a href="index.html">Globe</a><a href="explore.html">Collection</a><a href="how-it-works.html">How it works</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="mailto:hello@monudex.app">Contact</a></nav></div><div class="page-shell footer-bottom"><span>© 2026 MonuDex</span><span>585 monuments · 195 countries</span></div></footer>
+</body>
+</html>

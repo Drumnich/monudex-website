@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explore 585 Monuments | MonuDex</title>
+  <meta name="description" content="Search the complete MonuDex collection: 585 monuments across 195 countries, with coordinates, maps, images, and history.">
+  <meta name="theme-color" content="#0E1113">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
+  <link rel="apple-touch-icon" href="assets/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="assets/vendor/lucide.min.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="catalog.js" defer></script>
+  <script src="collection.js" defer></script>
+</head>
+<body data-page="collection">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" data-header>
+    <a class="brand" href="index.html" aria-label="MonuDex home"><img src="assets/logo-mark.svg" alt="" width="36" height="36"><span>MonuDex</span></a>
+    <button class="icon-button menu-button" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button><i data-lucide="menu" aria-hidden="true"></i></button>
+    <nav class="site-nav" aria-label="Primary navigation" data-nav>
+      <a href="index.html">Globe</a>
+      <a href="explore.html" aria-current="page">Collection</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a class="nav-cta" href="mailto:hello@monudex.app?subject=MonuDex%20beta%20access">Request beta access</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="page-hero collection-hero" aria-labelledby="page-title">
+      <div class="page-shell page-hero-content">
+        <p class="app-eyebrow"><span></span> Full world collection</p>
+        <h1 id="page-title">Every country.<br>Three places.</h1>
+        <p>Search all 585 MonuDex monuments, open a place to learn its history, and use its exact coordinates to plan the trip.</p>
+      </div>
+    </section>
+
+    <section class="explore-section page-shell collection-page" aria-labelledby="collection-title">
+      <div class="section-heading compact-heading">
+        <div>
+          <p class="app-eyebrow"><span></span> 195 country collections</p>
+          <h2 id="collection-title">The complete MonuDex.</h2>
+        </div>
+        <p>The icon you know, a place locals treasure, and one worth discovering in every country.</p>
+      </div>
+
+      <div class="explorer-toolbar" role="search">
+        <label class="search-field" for="monument-search">
+          <i data-lucide="search" aria-hidden="true"></i>
+          <span class="sr-only">Search monuments or countries</span>
+          <input id="monument-search" type="search" autocomplete="off" placeholder="Search monument or country" data-search>
+          <kbd>/</kbd>
+        </label>
+        <div class="filter-row" aria-label="Filter monuments by category" data-filters></div>
+      </div>
+
+      <div class="results-line" aria-live="polite">
+        <p data-results-copy>Loading the collection...</p>
+        <button class="text-button" type="button" data-clear hidden>Clear <i data-lucide="x" aria-hidden="true"></i></button>
+      </div>
+      <div class="monument-grid" data-grid aria-live="polite"></div>
+      <div class="empty-state" data-empty hidden>
+        <i data-lucide="map-pin-off" aria-hidden="true"></i>
+        <h3>No monument found</h3>
+        <p>Try a country, city, or a broader category.</p>
+      </div>
+      <button class="button button-outline load-more" type="button" data-load-more hidden>Show more monuments <i data-lucide="plus" aria-hidden="true"></i></button>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="page-shell footer-main">
+      <a class="brand footer-brand" href="index.html" aria-label="MonuDex home"><img src="assets/logo-mark.svg" alt="" width="38" height="38"><span>MonuDex</span></a>
+      <p>Collect the world in person.</p>
+      <nav aria-label="Footer navigation"><a href="index.html">Globe</a><a href="explore.html">Collection</a><a href="how-it-works.html">How it works</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="mailto:hello@monudex.app">Contact</a></nav>
+    </div>
+    <div class="page-shell footer-bottom"><span>© 2026 MonuDex</span><span>585 monuments · 195 countries</span></div>
+  </footer>
+
+  <dialog class="monument-dialog" data-monument-dialog aria-labelledby="dialog-monument-name">
+    <button class="icon-button dialog-close" type="button" aria-label="Close monument details" data-dialog-close><i data-lucide="x" aria-hidden="true"></i></button>
+    <img data-dialog-image alt="">
+    <div class="dialog-body">
+      <p class="app-eyebrow"><span></span> <span data-dialog-category></span></p>
+      <h2 id="dialog-monument-name" data-dialog-name></h2>
+      <p class="dialog-country" data-dialog-country></p>
+      <div class="dialog-coordinates"><i data-lucide="map-pin" aria-hidden="true"></i><span data-dialog-coordinates></span></div>
+      <div class="dialog-history"><span>History</span><p data-dialog-history>Loading history...</p><a href="https://en.wikipedia.org/" data-dialog-wikipedia target="_blank" rel="noreferrer" hidden>Read more on Wikipedia <i data-lucide="external-link" aria-hidden="true"></i></a></div>
+      <div class="dialog-actions">
+        <a class="button button-primary" href="https://www.google.com/maps" data-dialog-maps target="_blank" rel="noreferrer">Open in Maps <i data-lucide="external-link" aria-hidden="true"></i></a>
+        <a class="button button-outline" href="https://commons.wikimedia.org/" data-dialog-source target="_blank" rel="noreferrer">Image source</a>
+      </div>
+    </div>
+  </dialog>
+  <noscript>JavaScript is needed to search the monument collection.</noscript>
+</body>
+</html>
