@@ -3,13 +3,27 @@
     monuments: [],
     query: "",
     filter: "all",
-    visibleCount: 14,
+    visibleCount: 16,
+    globe: null,
+    globePinned: false,
+    globeMatches: [],
+    hoverTimer: null,
+    hideTimer: null,
+    historyRequest: 0,
   };
+
+  const historyCache = new Map();
 
   const els = {
     header: document.querySelector("[data-header]"),
     menuButton: document.querySelector("[data-menu-button]"),
     nav: document.querySelector("[data-nav]"),
+    globe: document.querySelector("[data-globe]"),
+    globeStage: document.querySelector("[data-globe-stage]"),
+    globeLoading: document.querySelector("[data-globe-loading]"),
+    globeSearch: document.querySelector("[data-globe-search]"),
+    globeResults: document.querySelector("[data-globe-results]"),
+    placePopover: document.querySelector("[data-place-popover]"),
     search: document.querySelector("[data-search]"),
     filters: document.querySelector("[data-filters]"),
     grid: document.querySelector("[data-grid]"),
@@ -23,19 +37,6 @@
     legalBody: document.querySelector("[data-legal-body]"),
   };
 
-  const featuredNames = [
-    "Eiffel Tower",
-    "Taj Mahal",
-    "Colosseum",
-    "Great Wall of China",
-    "Christ the Redeemer",
-    "Sydney Opera House",
-    "Machu Picchu",
-    "Petra",
-    "Angkor Wat",
-    "Statue of Liberty",
-  ];
-
   const filterDefinitions = [
     ["all", "All"],
     ["architecture", "Architecture"],
@@ -47,18 +48,8 @@
   ];
 
   const countryPicks = [
-    "France",
-    "Italy",
-    "India",
-    "Japan",
-    "Egypt",
-    "Mexico",
-    "Peru",
-    "Jordan",
-    "Cambodia",
-    "Brazil",
-    "United States",
-    "Australia",
+    "France", "Italy", "India", "Japan", "Egypt", "Mexico",
+    "Peru", "Jordan", "Cambodia", "Brazil", "United States", "Australia",
   ];
 
   const legalContent = {
@@ -85,7 +76,7 @@
   };
 
   function refreshIcons() {
-    if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 1.8 } });
+    if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 2 } });
   }
 
   function categoryKey(category = "") {
@@ -99,8 +90,7 @@
   }
 
   function categoryLabel(category = "") {
-    if (category === "Visit-worthy landmark") return "Landmark";
-    return category || "Landmark";
+    return category === "Visit-worthy landmark" ? "Landmark" : (category || "Landmark");
   }
 
   function searchableText(monument) {
@@ -109,22 +99,13 @@
 
   function filteredMonuments() {
     const query = state.query.trim().toLocaleLowerCase();
-    const filtered = state.monuments.filter((monument) => {
-      const categoryMatch = state.filter === "all" || categoryKey(monument.category) === state.filter;
-      const queryMatch = !query || searchableText(monument).includes(query);
-      return categoryMatch && queryMatch;
-    });
-
-    if (!query && state.filter === "all") {
-      const priority = new Map(featuredNames.map((name, index) => [name, index]));
-      return filtered.sort((a, b) => {
-        const aRank = priority.has(a.name) ? priority.get(a.name) : 999;
-        const bRank = priority.has(b.name) ? priority.get(b.name) : 999;
-        return aRank - bRank || a.country.localeCompare(b.country) || a.name.localeCompare(b.name);
-      });
-    }
-
-    return filtered.sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
+    return state.monuments
+      .filter((monument) => {
+        const categoryMatch = state.filter === "all" || categoryKey(monument.category) === state.filter;
+        const queryMatch = !query || searchableText(monument).includes(query);
+        return categoryMatch && queryMatch;
+      })
+      .sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
   }
 
   function formatIndex(monument) {
@@ -132,20 +113,19 @@
     return `#${String(index).padStart(3, "0")}`;
   }
 
-  function createMonumentCard(monument, index, useFeaturedLayout) {
+  function createMonumentCard(monument, index) {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "monument-card";
+    card.dataset.monumentId = monument.id;
     card.setAttribute("aria-label", `View ${monument.name} in ${monument.country}`);
-    if (useFeaturedLayout && index < 2) card.classList.add("featured-card");
 
     const imageWrap = document.createElement("span");
     imageWrap.className = "monument-card-image";
-
     const image = document.createElement("img");
     image.src = monument.photo;
     image.alt = monument.name;
-    image.loading = index < 4 ? "eager" : "lazy";
+    image.loading = index < 8 ? "eager" : "lazy";
     image.decoding = "async";
     image.addEventListener("error", () => {
       image.hidden = true;
@@ -159,14 +139,12 @@
 
     const copy = document.createElement("span");
     copy.className = "monument-card-copy";
-
     const text = document.createElement("span");
     const name = document.createElement("strong");
     name.textContent = monument.name;
     const place = document.createElement("span");
     place.textContent = `${monument.country} · ${categoryLabel(monument.category)}`;
     text.append(name, place);
-
     const arrow = document.createElement("i");
     arrow.dataset.lucide = "arrow-up-right";
     arrow.setAttribute("aria-hidden", "true");
@@ -194,7 +172,7 @@
       button.textContent = `${label} ${total}`;
       button.addEventListener("click", () => {
         state.filter = key;
-        state.visibleCount = 14;
+        state.visibleCount = 16;
         renderFilters();
         renderMonuments();
       });
@@ -205,22 +183,15 @@
   function renderMonuments() {
     const monuments = filteredMonuments();
     const visible = monuments.slice(0, state.visibleCount);
-    const defaultView = !state.query.trim() && state.filter === "all";
-
-    els.grid.replaceChildren(...visible.map((monument, index) => createMonumentCard(monument, index, defaultView)));
+    els.grid.replaceChildren(...visible.map(createMonumentCard));
     els.grid.hidden = monuments.length === 0;
     els.empty.hidden = monuments.length !== 0;
     els.loadMore.hidden = visible.length >= monuments.length || monuments.length === 0;
     els.clear.hidden = !state.query && state.filter === "all";
 
-    if (monuments.length === 0) {
-      els.resultsCopy.textContent = "No matches in the 585-place atlas";
-    } else if (visible.length < monuments.length) {
-      els.resultsCopy.textContent = `Showing ${visible.length} of ${monuments.length} matching monuments`;
-    } else {
-      els.resultsCopy.textContent = `${monuments.length} ${monuments.length === 1 ? "monument" : "monuments"}`;
-    }
-
+    if (!monuments.length) els.resultsCopy.textContent = "No matches in the 585-place collection";
+    else if (visible.length < monuments.length) els.resultsCopy.textContent = `Showing ${visible.length} of ${monuments.length} monuments`;
+    else els.resultsCopy.textContent = `${monuments.length} ${monuments.length === 1 ? "monument" : "monuments"}`;
     refreshIcons();
   }
 
@@ -230,30 +201,255 @@
       return result;
     }, {});
 
-    const buttons = countryPicks.filter((country) => counts[country]).map((country) => {
+    els.countries.replaceChildren(...countryPicks.filter((country) => counts[country]).map((country) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "country-button";
-      button.innerHTML = `<span></span><span>${counts[country]} places</span>`;
-      button.firstElementChild.textContent = country;
+      const name = document.createElement("span");
+      name.textContent = country;
+      const total = document.createElement("span");
+      total.textContent = `${counts[country]} places`;
+      button.append(name, total);
       button.addEventListener("click", () => {
         state.query = country;
         state.filter = "all";
-        state.visibleCount = 14;
+        state.visibleCount = 16;
         els.search.value = country;
         renderFilters();
         renderMonuments();
         document.querySelector("#explore").scrollIntoView({ behavior: "smooth" });
       });
       return button;
-    });
-
-    els.countries.replaceChildren(...buttons);
+    }));
   }
 
   function coordinate(value, positive, negative) {
-    const direction = value >= 0 ? positive : negative;
-    return `${Math.abs(value).toFixed(4)}° ${direction}`;
+    return `${Math.abs(value).toFixed(4)}° ${value >= 0 ? positive : negative}`;
+  }
+
+  function wikipediaSearchUrl(monument) {
+    return `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(`${monument.name} ${monument.country}`)}`;
+  }
+
+  function compactHistory(text, limit = 720) {
+    const clean = String(text || "").replace(/\s+/g, " ").trim();
+    if (clean.length <= limit) return clean;
+    const shortened = clean.slice(0, limit);
+    const end = Math.max(shortened.lastIndexOf(". "), shortened.lastIndexOf("; "));
+    return `${shortened.slice(0, end > limit * 0.6 ? end + 1 : limit).trim()}…`;
+  }
+
+  async function fetchHistory(monument) {
+    if (historyCache.has(monument.id)) return historyCache.get(monument.id);
+
+    const baseParams = {
+      action: "query",
+      format: "json",
+      origin: "*",
+      prop: "extracts|info",
+      exintro: "1",
+      explaintext: "1",
+      exsentences: "5",
+      inprop: "url",
+      redirects: "1",
+    };
+
+    const fallback = {
+      text: `${monument.name} is a ${categoryLabel(monument.category).toLowerCase()} in ${monument.country}. A verified historical summary is not available yet for this catalogue entry.`,
+      url: wikipediaSearchUrl(monument),
+    };
+
+    try {
+      const directParams = new URLSearchParams({ ...baseParams, titles: monument.name });
+      const directResponse = await fetch(`https://en.wikipedia.org/w/api.php?${directParams}`);
+      if (!directResponse.ok) throw new Error(`Wikipedia returned ${directResponse.status}`);
+      const directData = await directResponse.json();
+      let page = Object.values(directData.query?.pages || {})[0];
+
+      if (!page?.extract || page.missing !== undefined) {
+        const searchParams = new URLSearchParams({
+          ...baseParams,
+          generator: "search",
+          gsrsearch: `intitle:"${monument.name}" ${monument.country}`,
+          gsrnamespace: "0",
+          gsrlimit: "1",
+        });
+        const searchResponse = await fetch(`https://en.wikipedia.org/w/api.php?${searchParams}`);
+        if (!searchResponse.ok) throw new Error(`Wikipedia search returned ${searchResponse.status}`);
+        const searchData = await searchResponse.json();
+        page = Object.values(searchData.query?.pages || {})[0];
+      }
+
+      const result = page?.extract ? { text: compactHistory(page.extract), url: page.fullurl || fallback.url } : fallback;
+      historyCache.set(monument.id, result);
+      return result;
+    } catch (error) {
+      console.warn(`History unavailable for ${monument.name}`, error);
+      historyCache.set(monument.id, fallback);
+      return fallback;
+    }
+  }
+
+  async function fillHistory(monument, textElement, linkElement, requestId) {
+    const history = await fetchHistory(monument);
+    if (requestId !== state.historyRequest) return;
+    textElement.textContent = history.text;
+    linkElement.href = history.url;
+    linkElement.hidden = false;
+  }
+
+  function showPlace(monument, pinned = false) {
+    clearTimeout(state.hideTimer);
+    if (pinned) state.globePinned = true;
+    const popover = els.placePopover;
+    popover.dataset.monumentId = monument.id;
+    const image = popover.querySelector("[data-place-image]");
+    image.src = monument.photo;
+    image.alt = `${monument.name} in ${monument.country}`;
+    popover.querySelector("[data-place-category]").textContent = categoryLabel(monument.category);
+    popover.querySelector("[data-place-name]").textContent = monument.name;
+    popover.querySelector("[data-place-country]").textContent = monument.country;
+    const historyText = popover.querySelector("[data-place-history]");
+    const historyLink = popover.querySelector("[data-place-source]");
+    historyText.textContent = "Loading history...";
+    historyLink.hidden = true;
+    popover.hidden = false;
+    refreshIcons();
+
+    const requestId = ++state.historyRequest;
+    clearTimeout(state.hoverTimer);
+    state.hoverTimer = setTimeout(() => fillHistory(monument, historyText, historyLink, requestId), pinned ? 0 : 220);
+  }
+
+  function hidePlace(force = false) {
+    if (state.globePinned && !force) return;
+    clearTimeout(state.hoverTimer);
+    state.hideTimer = setTimeout(() => {
+      if (!state.globePinned || force) els.placePopover.hidden = true;
+    }, force ? 0 : 180);
+  }
+
+  function selectGlobePlace(monument) {
+    state.globePinned = true;
+    showPlace(monument, true);
+    els.globeResults.hidden = true;
+    els.globeSearch.value = monument.name;
+    if (state.globe) {
+      state.globe.pointOfView({ lat: monument.lat, lng: monument.lng, altitude: 1.15 }, 900);
+      state.globe.ringsData([monument]);
+      try { state.globe.controls().autoRotate = false; } catch (_) {}
+    }
+  }
+
+  function renderGlobeResults() {
+    const query = els.globeSearch.value.trim().toLocaleLowerCase();
+    if (!query) {
+      state.globeMatches = [];
+      els.globeResults.hidden = true;
+      return;
+    }
+
+    state.globeMatches = state.monuments.filter((monument) => searchableText(monument).includes(query)).slice(0, 6);
+    if (!state.globeMatches.length) {
+      const empty = document.createElement("p");
+      empty.className = "globe-result-empty";
+      empty.textContent = "No matching place";
+      els.globeResults.replaceChildren(empty);
+      els.globeResults.hidden = false;
+      return;
+    }
+
+    els.globeResults.replaceChildren(...state.globeMatches.map((monument) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "globe-result";
+      button.dataset.monumentId = monument.id;
+      const image = document.createElement("img");
+      image.src = monument.photo;
+      image.alt = "";
+      const copy = document.createElement("span");
+      const name = document.createElement("strong");
+      name.textContent = monument.name;
+      const country = document.createElement("span");
+      country.textContent = monument.country;
+      copy.append(name, country);
+      const icon = document.createElement("i");
+      icon.dataset.lucide = "locate-fixed";
+      icon.setAttribute("aria-hidden", "true");
+      button.append(image, copy, icon);
+      button.addEventListener("click", () => selectGlobePlace(monument));
+      return button;
+    }));
+    els.globeResults.hidden = false;
+    refreshIcons();
+  }
+
+  function initGlobe() {
+    if (!window.Globe) {
+      els.globeLoading.querySelector("p").textContent = "3D globe unavailable";
+      return;
+    }
+
+    try {
+      const globe = window.Globe({ animateIn: false })(els.globe)
+        .globeImageUrl("assets/earth-blue-marble.jpg")
+        .bumpImageUrl("assets/earth-topology.png")
+        .backgroundColor("rgba(0,0,0,0)")
+        .showAtmosphere(true)
+        .atmosphereColor("#0E9F6E")
+        .atmosphereAltitude(0.18)
+        .pointsData(state.monuments)
+        .pointLat("lat")
+        .pointLng("lng")
+        .pointColor(() => "#18D294")
+        .pointAltitude(0.018)
+        .pointRadius(0.16)
+        .pointResolution(8)
+        .pointLabel(() => "")
+        .ringsData([])
+        .ringLat("lat")
+        .ringLng("lng")
+        .ringColor(() => (time) => `rgba(14,159,110,${1 - time})`)
+        .ringMaxRadius(4)
+        .ringPropagationSpeed(2.2)
+        .ringRepeatPeriod(900)
+        .onPointHover((monument) => {
+          if (state.globePinned) return;
+          if (monument) showPlace(monument, false);
+          else hidePlace(false);
+        })
+        .onPointClick((monument) => selectGlobePlace(monument))
+        .onGlobeClick(() => {
+          if (!state.globePinned) return;
+          state.globePinned = false;
+          globe.ringsData([]);
+          hidePlace(true);
+        })
+        .onGlobeReady(() => els.globeLoading.classList.add("is-ready"));
+
+      state.globe = globe;
+      els.globe.dataset.pointCount = String(state.monuments.length);
+      els.globe.__monudexGlobe = globe;
+      els.globe.__monudexPoints = state.monuments;
+      const controls = globe.controls();
+      controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      controls.autoRotateSpeed = 0.35;
+      controls.enablePan = false;
+      controls.minDistance = 150;
+      controls.maxDistance = 520;
+      globe.pointOfView({ lat: 18, lng: 10, altitude: 2.15 });
+
+      const size = () => {
+        const rect = els.globeStage.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) globe.width(rect.width).height(rect.height);
+      };
+      new ResizeObserver(size).observe(els.globeStage);
+      size();
+      els.globeStage.addEventListener("pointerdown", () => { controls.autoRotate = false; }, { passive: true });
+    } catch (error) {
+      console.error("Unable to initialize globe", error);
+      els.globeLoading.querySelector("p").textContent = "3D globe unavailable";
+    }
   }
 
   function openMonument(monument) {
@@ -267,14 +463,19 @@
     dialog.querySelector("[data-dialog-coordinates]").textContent = `${coordinate(monument.lat, "N", "S")} · ${coordinate(monument.lng, "E", "W")}`;
     dialog.querySelector("[data-dialog-maps]").href = `https://www.google.com/maps/search/?api=1&query=${monument.lat},${monument.lng}`;
     dialog.querySelector("[data-dialog-source]").href = monument.photo;
+    const historyText = dialog.querySelector("[data-dialog-history]");
+    const historyLink = dialog.querySelector("[data-dialog-wikipedia]");
+    historyText.textContent = "Loading history...";
+    historyLink.hidden = true;
     dialog.showModal();
     refreshIcons();
+    const requestId = ++state.historyRequest;
+    fillHistory(monument, historyText, historyLink, requestId);
   }
 
   function openLegal(type, updateHash = true) {
     const content = legalContent[type];
     if (!content) return;
-
     const title = document.createElement("h2");
     title.id = "legal-title";
     title.textContent = content.title;
@@ -290,7 +491,6 @@
       wrapper.append(h3, paragraph);
       return wrapper;
     });
-
     els.legalBody.replaceChildren(title, date, ...sections);
     els.legalDialog.showModal();
     if (updateHash) window.history.pushState(null, "", `#${type}`);
@@ -298,9 +498,7 @@
 
   function closeLegal() {
     els.legalDialog.close();
-    if (["#privacy", "#terms"].includes(window.location.hash)) {
-      window.history.replaceState(null, "", `${window.location.pathname}#top`);
-    }
+    if (["#privacy", "#terms"].includes(window.location.hash)) window.history.replaceState(null, "", `${window.location.pathname}#top`);
   }
 
   function setMenu(open) {
@@ -309,44 +507,33 @@
     els.menuButton.setAttribute("aria-expanded", String(open));
     els.menuButton.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
     const icon = els.menuButton.querySelector("svg");
-    if (icon) {
-      icon.outerHTML = `<i data-lucide="${open ? "x" : "menu"}" aria-hidden="true"></i>`;
-      refreshIcons();
-    }
+    if (icon) icon.outerHTML = `<i data-lucide="${open ? "x" : "menu"}" aria-hidden="true"></i>`;
+    refreshIcons();
   }
 
   function bindEvents() {
-    window.addEventListener("scroll", () => {
-      els.header.classList.toggle("is-scrolled", window.scrollY > 24);
-    }, { passive: true });
+    window.addEventListener("scroll", () => els.header.classList.toggle("is-scrolled", window.scrollY > 36), { passive: true });
+    els.menuButton.addEventListener("click", () => setMenu(els.menuButton.getAttribute("aria-expanded") !== "true"));
+    els.nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenu(false)));
 
-    els.menuButton.addEventListener("click", () => {
-      setMenu(els.menuButton.getAttribute("aria-expanded") !== "true");
-    });
-
-    els.nav.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => setMenu(false));
+    els.globeSearch.addEventListener("input", renderGlobeResults);
+    els.globeSearch.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && state.globeMatches.length) {
+        event.preventDefault();
+        selectGlobePlace(state.globeMatches[0]);
+      }
     });
 
     els.search.addEventListener("input", (event) => {
       state.query = event.target.value;
-      state.visibleCount = 14;
+      state.visibleCount = 16;
       renderMonuments();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      const tag = document.activeElement?.tagName;
-      if (event.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
-        event.preventDefault();
-        els.search.focus();
-      }
-      if (event.key === "Escape" && els.header.classList.contains("menu-active")) setMenu(false);
     });
 
     els.clear.addEventListener("click", () => {
       state.query = "";
       state.filter = "all";
-      state.visibleCount = 14;
+      state.visibleCount = 16;
       els.search.value = "";
       renderFilters();
       renderMonuments();
@@ -358,18 +545,41 @@
       renderMonuments();
     });
 
+    document.addEventListener("keydown", (event) => {
+      const tag = document.activeElement?.tagName;
+      if (event.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
+        event.preventDefault();
+        const heroBottom = document.querySelector(".globe-hero").getBoundingClientRect().bottom;
+        (heroBottom > 200 ? els.globeSearch : els.search).focus();
+      }
+      if (event.key === "Escape") {
+        if (els.header.classList.contains("menu-active")) setMenu(false);
+        els.globeResults.hidden = true;
+        state.globePinned = false;
+        if (state.globe) state.globe.ringsData([]);
+        hidePlace(true);
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".globe-search-wrap")) els.globeResults.hidden = true;
+    });
+
+    els.placePopover.addEventListener("mouseenter", () => clearTimeout(state.hideTimer));
+    els.placePopover.addEventListener("mouseleave", () => hidePlace(false));
+    document.querySelector("[data-place-close]").addEventListener("click", () => {
+      state.globePinned = false;
+      if (state.globe) state.globe.ringsData([]);
+      hidePlace(true);
+    });
+
     document.querySelector("[data-dialog-close]").addEventListener("click", () => els.monumentDialog.close());
     document.querySelector("[data-legal-close]").addEventListener("click", closeLegal);
-    document.querySelectorAll("[data-legal]").forEach((button) => {
-      button.addEventListener("click", () => openLegal(button.dataset.legal));
-    });
+    document.querySelectorAll("[data-legal]").forEach((button) => button.addEventListener("click", () => openLegal(button.dataset.legal)));
 
     [els.monumentDialog, els.legalDialog].forEach((dialog) => {
       dialog.addEventListener("click", (event) => {
-        if (event.target === dialog) {
-          if (dialog === els.legalDialog) closeLegal();
-          else dialog.close();
-        }
+        if (event.target === dialog) dialog === els.legalDialog ? closeLegal() : dialog.close();
       });
     });
 
@@ -383,7 +593,7 @@
   async function init() {
     bindEvents();
     refreshIcons();
-    els.header.classList.toggle("is-scrolled", window.scrollY > 24);
+    els.header.classList.toggle("is-scrolled", window.scrollY > 36);
 
     try {
       const response = await fetch("data/monuments.json");
@@ -394,13 +604,15 @@
       renderFilters();
       renderMonuments();
       renderCountries();
+      initGlobe();
     } catch (error) {
       console.error("Unable to load monument catalogue", error);
-      els.resultsCopy.textContent = "The monument atlas could not be loaded.";
+      els.resultsCopy.textContent = "The monument collection could not be loaded.";
       els.grid.hidden = true;
       els.empty.hidden = false;
-      els.empty.querySelector("h3").textContent = "Atlas unavailable";
+      els.empty.querySelector("h3").textContent = "Collection unavailable";
       els.empty.querySelector("p").textContent = "Please refresh the page and try again.";
+      els.globeLoading.querySelector("p").textContent = "Monument data unavailable";
     }
 
     const initialRoute = window.location.hash.slice(1);

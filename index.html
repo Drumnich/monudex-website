@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MonuDex | Collect the world in person</title>
-  <meta name="description" content="MonuDex turns real-world travel into a collection. Visit a monument, verify it with a selfie and location, and keep your personal atlas of 585 monuments across 195 countries.">
-  <meta name="theme-color" content="#0b1712">
+  <meta name="description" content="Explore 585 monuments across 195 countries on the MonuDex globe. Visit a place, verify it with a selfie and location, and build your personal collection.">
+  <meta name="theme-color" content="#0E1113">
   <meta property="og:type" content="website">
   <meta property="og:title" content="MonuDex | Collect the world in person">
-  <meta property="og:description" content="A real-world monument collection for travelers. 585 places, 195 countries, one personal atlas.">
+  <meta property="og:description" content="585 monuments. 195 countries. One personal collection built through real travel.">
   <meta property="og:url" content="https://monudex.com/">
   <meta property="og:image" content="https://monudex.com/assets/og-monudex.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -16,8 +16,9 @@
   <link rel="apple-touch-icon" href="assets/icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js" defer></script>
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="app.js" defer></script>
 </head>
@@ -35,7 +36,8 @@
     </button>
 
     <nav class="site-nav" aria-label="Primary navigation" data-nav>
-      <a href="#explore">Explore</a>
+      <a href="#top">Globe</a>
+      <a href="#explore">Collection</a>
       <a href="#how">How it works</a>
       <a href="#verification">Verification</a>
       <a class="nav-cta" href="mailto:hello@monudex.app?subject=MonuDex%20beta%20access">Request beta access</a>
@@ -43,57 +45,88 @@
   </header>
 
   <main id="main">
-    <section class="hero" id="top" aria-labelledby="hero-title">
-      <img class="hero-media" src="assets/hero-eiffel.jpg" alt="The Eiffel Tower rising above Paris at dusk">
-      <div class="hero-shade" aria-hidden="true"></div>
-      <div class="hero-content page-shell">
-        <p class="eyebrow hero-eyebrow"><span></span> The world is your collection</p>
-        <h1 id="hero-title">MonuDex</h1>
-        <p class="hero-line">Collect the places that<br><em>made you stop and look.</em></p>
-        <p class="hero-copy">Travel to a monument. Take a selfie there. Unlock it only when the image and your location agree.</p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="mailto:hello@monudex.app?subject=MonuDex%20beta%20access">
-            Request beta access <i data-lucide="arrow-up-right" aria-hidden="true"></i>
-          </a>
-          <a class="button button-quiet" href="#explore">
-            Browse the atlas <i data-lucide="arrow-down" aria-hidden="true"></i>
-          </a>
+    <section class="globe-hero" id="top" aria-labelledby="hero-title">
+      <div class="globe-stage" data-globe-stage aria-label="Interactive globe showing all 585 MonuDex monuments">
+        <div class="globe-canvas" data-globe></div>
+        <div class="globe-loading" data-globe-loading>
+          <span></span>
+          <p>Loading 585 places</p>
         </div>
       </div>
-      <a class="hero-credit" href="https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons_(cropped).jpg" target="_blank" rel="noreferrer">Eiffel Tower, Paris · Wikimedia Commons</a>
-    </section>
 
-    <section class="stat-band" aria-label="MonuDex collection coverage">
-      <div class="page-shell stat-grid">
-        <div><strong>585</strong><span>monuments</span></div>
-        <div><strong>195</strong><span>countries</span></div>
-        <div><strong>3</strong><span>places per country</span></div>
-        <p>Not a checklist somebody else wrote. A map of where you have actually been.</p>
+      <div class="hero-content page-shell">
+        <p class="app-eyebrow"><span></span> The world is your collection</p>
+        <h1 id="hero-title">MonuDex</h1>
+        <p class="hero-line">Collect the world.<br>Prove you were there.</p>
+        <p class="hero-copy">Explore every monument in the database, discover its story, then unlock it in the app with a location-verified selfie.</p>
+
+        <div class="globe-search-wrap">
+          <label class="globe-search" for="globe-search">
+            <i data-lucide="search" aria-hidden="true"></i>
+            <span class="sr-only">Find a monument on the globe</span>
+            <input id="globe-search" type="search" autocomplete="off" placeholder="Find a monument or country" data-globe-search>
+            <kbd>/</kbd>
+          </label>
+          <div class="globe-results" data-globe-results hidden></div>
+        </div>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="mailto:hello@monudex.app?subject=MonuDex%20beta%20access">Request beta access <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+          <a class="button button-dark" href="#explore">View collection <i data-lucide="grid-2x2" aria-hidden="true"></i></a>
+        </div>
+
+        <div class="hero-stats" aria-label="MonuDex catalogue coverage">
+          <div><strong>585</strong><span>Monuments</span></div>
+          <div><strong>195</strong><span>Countries</span></div>
+          <div><strong>3</strong><span>Per country</span></div>
+        </div>
       </div>
+
+      <div class="globe-instruction" aria-hidden="true">
+        <i data-lucide="mouse-pointer-2"></i>
+        <span>Drag to explore · Hover or tap a point</span>
+      </div>
+
+      <aside class="place-popover" data-place-popover hidden aria-live="polite">
+        <button class="icon-button place-close" type="button" aria-label="Close place information" data-place-close>
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+        <img data-place-image alt="">
+        <div class="place-copy">
+          <p class="app-eyebrow"><span></span> <span data-place-category>Monument</span></p>
+          <h2 data-place-name></h2>
+          <p class="place-country"><i data-lucide="map-pin" aria-hidden="true"></i><span data-place-country></span></p>
+          <div class="history-block">
+            <span class="history-label">History</span>
+            <p data-place-history>Loading history...</p>
+          </div>
+          <a class="history-source" href="https://en.wikipedia.org/" data-place-source target="_blank" rel="noreferrer" hidden>Read more on Wikipedia <i data-lucide="external-link" aria-hidden="true"></i></a>
+        </div>
+      </aside>
     </section>
 
     <section class="explore-section page-shell" id="explore" aria-labelledby="explore-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow"><span></span> The global atlas</p>
-          <h2 id="explore-title">Where will you begin?</h2>
+          <p class="app-eyebrow"><span></span> Full collection</p>
+          <h2 id="explore-title">585 places.<br>Every country.</h2>
         </div>
-        <p>Search the full MonuDex catalogue. Every country has three places waiting to be found.</p>
+        <p>The same collection as the app, ready to search. Open any monument to see its location and history.</p>
       </div>
 
       <div class="explorer-toolbar" role="search">
         <label class="search-field" for="monument-search">
           <i data-lucide="search" aria-hidden="true"></i>
           <span class="sr-only">Search monuments or countries</span>
-          <input id="monument-search" type="search" autocomplete="off" placeholder="Search a monument or country" data-search>
+          <input id="monument-search" type="search" autocomplete="off" placeholder="Search monument or country" data-search>
           <kbd>/</kbd>
         </label>
         <div class="filter-row" aria-label="Filter monuments by category" data-filters></div>
       </div>
 
       <div class="results-line" aria-live="polite">
-        <p data-results-copy>Loading the world...</p>
-        <button class="text-button" type="button" data-clear hidden>Clear search <i data-lucide="x" aria-hidden="true"></i></button>
+        <p data-results-copy>Loading the collection...</p>
+        <button class="text-button" type="button" data-clear hidden>Clear <i data-lucide="x" aria-hidden="true"></i></button>
       </div>
 
       <div class="monument-grid" data-grid aria-live="polite"></div>
@@ -102,28 +135,27 @@
         <h3>No monument found</h3>
         <p>Try a country, city, or a broader category.</p>
       </div>
-      <button class="button button-outline load-more" type="button" data-load-more hidden>
-        Show more monuments <i data-lucide="plus" aria-hidden="true"></i>
-      </button>
+      <button class="button button-outline load-more" type="button" data-load-more hidden>Show more monuments <i data-lucide="plus" aria-hidden="true"></i></button>
     </section>
 
     <section class="country-band" aria-labelledby="country-title">
       <div class="page-shell country-layout">
         <div>
-          <p class="eyebrow eyebrow-light"><span></span> 195 country collections</p>
-          <h2 id="country-title">The famous stop.<br>The local icon.<br>The one you did not expect.</h2>
+          <p class="app-eyebrow"><span></span> 195 country collections</p>
+          <h2 id="country-title">Three places.<br>One country card.</h2>
+          <p>Every country gets equal space in MonuDex: the icon you know, a place locals treasure, and one worth discovering.</p>
         </div>
         <div class="country-list" data-countries></div>
       </div>
     </section>
 
     <section class="how-section page-shell" id="how" aria-labelledby="how-title">
-      <div class="section-heading narrow-heading">
+      <div class="section-heading">
         <div>
-          <p class="eyebrow"><span></span> Three moves</p>
-          <h2 id="how-title">Find it. Face it. Keep it.</h2>
+          <p class="app-eyebrow"><span></span> How it works</p>
+          <h2 id="how-title">Find it. Face it. Unlock it.</h2>
         </div>
-        <p>MonuDex is deliberately simple. Your collection grows from real travel, not taps from the sofa.</p>
+        <p>Your collection grows from real travel. Every unlock connects a place, a photo, and a moment.</p>
       </div>
 
       <ol class="step-list">
@@ -131,19 +163,19 @@
           <span class="step-number">01</span>
           <div class="step-icon"><i data-lucide="navigation" aria-hidden="true"></i></div>
           <h3>Get close</h3>
-          <p>Open a monument and reach its verified location zone, roughly two kilometres around the landmark.</p>
+          <p>Reach the verified area around the monument, roughly two kilometres from its coordinates.</p>
         </li>
         <li>
           <span class="step-number">02</span>
-          <div class="step-icon step-icon-coral"><i data-lucide="camera" aria-hidden="true"></i></div>
+          <div class="step-icon"><i data-lucide="camera" aria-hidden="true"></i></div>
           <h3>Take the selfie</h3>
-          <p>Capture yourself with the monument in the same frame. The camera sends one clear proof attempt.</p>
+          <p>Frame yourself and the monument together using the in-app detector camera.</p>
         </li>
         <li>
           <span class="step-number">03</span>
-          <div class="step-icon step-icon-blue"><i data-lucide="stamp" aria-hidden="true"></i></div>
-          <h3>Unlock the memory</h3>
-          <p>When image recognition and location match, the monument joins your personal MonuDex.</p>
+          <div class="step-icon"><i data-lucide="badge-check" aria-hidden="true"></i></div>
+          <h3>Add to MonuDex</h3>
+          <p>When the image and location match, the monument becomes part of your collection.</p>
         </li>
       </ol>
     </section>
@@ -151,23 +183,13 @@
     <section class="verification-section" id="verification" aria-labelledby="verification-title">
       <div class="page-shell verification-layout">
         <div class="verification-copy">
-          <p class="eyebrow eyebrow-light"><span></span> Proof, not pretence</p>
-          <h2 id="verification-title">Two signals.<br>One honest unlock.</h2>
-          <p class="verification-intro">A monument is added only when the photo contains the right landmark and the device is inside its location range.</p>
-
+          <p class="app-eyebrow"><span></span> AI monument detector</p>
+          <h2 id="verification-title">Two checks.<br>One real unlock.</h2>
+          <p class="verification-intro">MonuDex checks what the camera sees and where the device is before adding a monument.</p>
           <div class="proof-list">
-            <div>
-              <i data-lucide="scan-search" aria-hidden="true"></i>
-              <p><strong>Visual recognition</strong><span>AI compares the landmark in your photo with the monument you are visiting.</span></p>
-            </div>
-            <div>
-              <i data-lucide="locate-fixed" aria-hidden="true"></i>
-              <p><strong>Location confirmation</strong><span>Precise location confirms that the picture was taken near the real place.</span></p>
-            </div>
-            <div>
-              <i data-lucide="shield-check" aria-hidden="true"></i>
-              <p><strong>Privacy by default</strong><span>Your location is used for the unlock attempt, not to create a public travel trail.</span></p>
-            </div>
+            <div><i data-lucide="scan-search" aria-hidden="true"></i><p><strong>Image matches the monument</strong><span>Visual recognition looks for the landmark in the submitted photo.</span></p></div>
+            <div><i data-lucide="locate-fixed" aria-hidden="true"></i><p><strong>Location permission granted</strong><span>Precise location confirms the attempt happened near the real place.</span></p></div>
+            <div><i data-lucide="shield-check" aria-hidden="true"></i><p><strong>Within unlock range</strong><span>Both checks must pass before the collection changes.</span></p></div>
           </div>
         </div>
 
@@ -176,7 +198,7 @@
             <div class="phone-island" aria-hidden="true"></div>
             <img src="assets/app-detector.png" alt="MonuDex camera detector confirming the Eiffel Tower with image and location checks">
           </div>
-          <figcaption>Real MonuDex detector screen · iOS development build</figcaption>
+          <figcaption>MonuDex iOS detector · development build</figcaption>
         </figure>
       </div>
     </section>
@@ -185,9 +207,9 @@
       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/1280px-Taj_Mahal_%28Edited%29.jpeg" alt="The Taj Mahal reflected in its long pool" loading="lazy">
       <div class="closing-shade" aria-hidden="true"></div>
       <div class="page-shell closing-content">
-        <p class="eyebrow hero-eyebrow"><span></span> Private iOS beta</p>
-        <h2 id="closing-title">The world is already out there.</h2>
-        <p>MonuDex is being prepared for TestFlight. Ask for an invite and help shape the first global collection.</p>
+        <p class="app-eyebrow"><span></span> Private iOS beta</p>
+        <h2 id="closing-title">Start your collection.</h2>
+        <p>MonuDex is being prepared for TestFlight. Ask for an invite and help shape the first global monument collection.</p>
         <a class="button button-primary" href="mailto:hello@monudex.app?subject=MonuDex%20beta%20access">Request beta access <i data-lucide="send" aria-hidden="true"></i></a>
       </div>
     </section>
@@ -195,52 +217,44 @@
 
   <footer class="site-footer">
     <div class="page-shell footer-main">
-      <a class="brand footer-brand" href="#top" aria-label="MonuDex home">
-        <img src="assets/logo-mark.svg" alt="" width="38" height="38">
-        <span>MonuDex</span>
-      </a>
+      <a class="brand footer-brand" href="#top" aria-label="MonuDex home"><img src="assets/logo-mark.svg" alt="" width="38" height="38"><span>MonuDex</span></a>
       <p>Collect the world in person.</p>
       <nav aria-label="Footer navigation">
-        <a href="#explore">Explore</a>
-        <a href="#how">How it works</a>
+        <a href="#top">Globe</a>
+        <a href="#explore">Collection</a>
         <a href="mailto:hello@monudex.app">Contact</a>
         <button type="button" data-legal="privacy">Privacy</button>
         <button type="button" data-legal="terms">Terms</button>
       </nav>
     </div>
-    <div class="page-shell footer-bottom">
-      <span>© 2026 MonuDex</span>
-      <span>Built for curious feet.</span>
-    </div>
+    <div class="page-shell footer-bottom"><span>© 2026 MonuDex</span><span>585 monuments · 195 countries</span></div>
   </footer>
 
   <dialog class="monument-dialog" data-monument-dialog aria-labelledby="dialog-monument-name">
-    <button class="icon-button dialog-close" type="button" aria-label="Close monument details" data-dialog-close>
-      <i data-lucide="x" aria-hidden="true"></i>
-    </button>
+    <button class="icon-button dialog-close" type="button" aria-label="Close monument details" data-dialog-close><i data-lucide="x" aria-hidden="true"></i></button>
     <img data-dialog-image alt="">
     <div class="dialog-body">
-      <p class="eyebrow"><span></span> <span data-dialog-category></span></p>
+      <p class="app-eyebrow"><span></span> <span data-dialog-category></span></p>
       <h2 id="dialog-monument-name" data-dialog-name></h2>
       <p class="dialog-country" data-dialog-country></p>
-      <div class="dialog-coordinates">
-        <i data-lucide="map-pin" aria-hidden="true"></i>
-        <span data-dialog-coordinates></span>
+      <div class="dialog-coordinates"><i data-lucide="map-pin" aria-hidden="true"></i><span data-dialog-coordinates></span></div>
+      <div class="dialog-history">
+        <span>History</span>
+        <p data-dialog-history>Loading history...</p>
+        <a href="https://en.wikipedia.org/" data-dialog-wikipedia target="_blank" rel="noreferrer" hidden>Read more on Wikipedia <i data-lucide="external-link" aria-hidden="true"></i></a>
       </div>
       <div class="dialog-actions">
-        <a class="button button-primary" data-dialog-maps target="_blank" rel="noreferrer">Open in Maps <i data-lucide="external-link" aria-hidden="true"></i></a>
-        <a class="button button-outline" data-dialog-source target="_blank" rel="noreferrer">Image source</a>
+        <a class="button button-primary" href="https://www.google.com/maps" data-dialog-maps target="_blank" rel="noreferrer">Open in Maps <i data-lucide="external-link" aria-hidden="true"></i></a>
+        <a class="button button-outline" href="https://commons.wikimedia.org/" data-dialog-source target="_blank" rel="noreferrer">Image source</a>
       </div>
     </div>
   </dialog>
 
   <dialog class="legal-dialog" data-legal-dialog aria-labelledby="legal-title">
-    <button class="icon-button dialog-close" type="button" aria-label="Close" data-legal-close>
-      <i data-lucide="x" aria-hidden="true"></i>
-    </button>
+    <button class="icon-button dialog-close" type="button" aria-label="Close" data-legal-close><i data-lucide="x" aria-hidden="true"></i></button>
     <div class="legal-body" data-legal-body></div>
   </dialog>
 
-  <noscript>MonuDex needs JavaScript to search the monument atlas. The rest of the site remains available.</noscript>
+  <noscript>MonuDex needs JavaScript to render the globe and search the monument collection.</noscript>
 </body>
 </html>
