@@ -1317,6 +1317,32 @@ dialog::backdrop { background: rgba(5, 8, 7, 0.78); backdrop-filter: blur(8px); 
 .legal-body h3 { margin: 26px 0 7px; font-size: 16px; }
 .legal-body p { color: var(--ink-2); font-size: 13px; }
 
+.support-hero { min-height: 520px; background: #0B1110; }
+.support-contact {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 64px;
+  padding: 32px;
+  color: #FFFFFF;
+  background: var(--dark-2);
+  border-radius: 8px;
+}
+.support-contact h2 { margin: 8px 0 10px; font-size: 34px; line-height: 1.05; }
+.support-contact p { max-width: 640px; margin: 0; color: #B9C0C5; }
+.support-contact .button { flex: 0 0 auto; }
+
+.credits-page { padding-top: 88px; padding-bottom: 110px; }
+.credits-search { margin-bottom: 18px; }
+.credits-status { margin: 0 0 14px; color: var(--ink-3); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+.credits-list { border-top: 1px solid var(--line); }
+.credits-list article { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; border-bottom: 1px solid var(--line); }
+.credits-list article div { display: flex; min-width: 0; flex-direction: column; }
+.credits-list strong { overflow-wrap: anywhere; font-size: 15px; }
+.credits-list span { color: var(--ink-3); font-size: 12px; font-weight: 700; }
+.credits-list a { flex: 0 0 auto; color: var(--accent-dark); font-size: 12px; font-weight: 800; }
+
 noscript { display: block; padding: 16px; color: #FFFFFF; background: var(--danger); text-align: center; }
 
 @media (max-width: 1050px) {
@@ -1455,6 +1481,10 @@ noscript { display: block; padding: 16px; color: #FFFFFF; background: var(--dang
   .legal-index { position: static; margin-bottom: 54px; }
   .legal-content section + section { margin-top: 38px; padding-top: 38px; }
   .legal-content h2 { font-size: 26px; }
+  .support-contact { align-items: stretch; flex-direction: column; margin-top: 44px; padding: 24px 18px; }
+  .support-contact .button { width: 100%; }
+  .credits-page { padding-top: 58px; padding-bottom: 88px; }
+  .credits-list article { align-items: flex-start; flex-direction: column; gap: 8px; padding: 16px 0; }
 
   .monument-dialog > img { aspect-ratio: 4 / 3; }
   .dialog-body { padding: 23px 18px 26px; }
