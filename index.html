@@ -693,9 +693,10 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     const d = (props.direction==='Dex'||props.direction==='B') ? 'B' : 'A';
+    const initialPage = this.routeFromHash();
     this._defaultDir='A';
     this.state = {
-      dir:d, page:'home', monuments:[], q:'', filter:'all',
+      dir:d, page:initialPage, monuments:[], q:'', filter:'all',
       modal:null, openFaq:0, counts:{m:0,c:0,k:0}, exploreActive:null,
       cName:'', cEmail:'', cMsg:'', contactSent:false, contactError:false
     };
@@ -716,7 +717,15 @@ class Component extends DCLogic {
     ];
   }
 
+  routeFromHash(){
+    const raw=(window.location.hash||'').replace(/^#/,'').toLowerCase();
+    const pages=new Set(['home','explore','how','privacy','terms','contact']);
+    return pages.has(raw) ? raw : 'home';
+  }
+
   componentDidMount(){
+    this._onHashChange=()=>{ const page=this.routeFromHash(); if(page!==this.state.page) this.go(page,{replace:true}); };
+    window.addEventListener('hashchange',this._onHashChange);
     fetch('data/monuments.json').then(r=>r.json()).then(list=>{
       const mons=list.map(m=>({...m, rarity:this.rarityOf(m)}));
       this.setState({monuments:mons}, ()=>{ this.initHeroGlobe(); this.maybeExploreGlobe(); this.setupReveal(); this.setMockups(); });
@@ -725,6 +734,10 @@ class Component extends DCLogic {
     this.restoreVideo();
     this.setupReveal();
     this.startStars();
+  }
+
+  componentWillUnmount(){
+    if(this._onHashChange) window.removeEventListener('hashchange',this._onHashChange);
   }
 
   componentDidUpdate(){
@@ -952,7 +965,16 @@ class Component extends DCLogic {
   closeModal(){ this.setState({modal:null}); }
 
   /* ---------- nav ---------- */
-  go(p){ this.setState({page:p,modal:null}); window.scrollTo({top:0,behavior:'instant'in document.documentElement.style?'instant':'auto'}); }
+  go(p, opts){
+    const page=['home','explore','how','privacy','terms','contact'].includes(p) ? p : 'home';
+    const hash=page==='home' ? window.location.pathname : `${window.location.pathname}#${page}`;
+    if(window.location.pathname + window.location.hash !== hash){
+      const method=opts&&opts.replace ? 'replaceState' : 'pushState';
+      try{ window.history[method](null,'',hash); }catch(e){}
+    }
+    this.setState({page,modal:null});
+    window.scrollTo({top:0,behavior:'instant'in document.documentElement.style?'instant':'auto'});
+  }
 
   /* ---------- render ---------- */
   renderVals(){
@@ -1009,7 +1031,7 @@ class Component extends DCLogic {
       dirAbtn:dirBtn(dir==='A'), dirBbtn:dirBtn(dir==='B'),
       setDirA:()=>this.setState({dir:'A'}), setDirB:()=>this.setState({dir:'B'}),
       goHome:()=>this.go('home'), goExplore:()=>this.go('explore'), goHow:()=>this.go('how'),
-      goGet:()=>{ this.setState({page:'home'}); setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),60); },
+      goGet:()=>{ this.go('home'); setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),60); },
       closeModal:()=>this.closeModal(), stop:(e)=>e.stopPropagation(),
     };
   }
