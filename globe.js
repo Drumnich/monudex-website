@@ -7,6 +7,7 @@
     results: document.querySelector("[data-globe-results]"),
     popover: document.querySelector("[data-place-popover]"),
     close: document.querySelector("[data-place-close]"),
+    rotation: document.querySelector("[data-globe-rotation]"),
   };
   if (!els.globe || !window.MonuDexData) return;
 
@@ -19,10 +20,30 @@
     hoverTimer: null,
     hideTimer: null,
     fallbackProjection: null,
+    fallback: null,
+    rotationEnabled: true,
   };
 
   const refreshIcons = () => window.MonuDexSite?.refreshIcons();
   const { categoryLabel, searchableText, loadMonuments, fetchHistory } = window.MonuDexData;
+
+  function updateRotationControl() {
+    if (!els.rotation) return;
+    const label = state.rotationEnabled ? "Pause globe rotation" : "Resume globe rotation";
+    els.rotation.setAttribute("aria-label", label);
+    els.rotation.setAttribute("aria-pressed", String(state.rotationEnabled));
+    els.rotation.title = label;
+    const icon = els.rotation.querySelector("[data-lucide]");
+    if (icon) icon.setAttribute("data-lucide", state.rotationEnabled ? "pause" : "play");
+    refreshIcons();
+  }
+
+  function setRotation(enabled) {
+    state.rotationEnabled = enabled;
+    if (state.globe) state.globe.controls().autoRotate = enabled;
+    els.globe.dataset.rotating = String(enabled);
+    updateRotationControl();
+  }
 
   async function fillHistory(monument, requestId) {
     const history = await fetchHistory(monument);
@@ -72,7 +93,6 @@
     if (state.globe) {
       state.globe.pointOfView({ lat: monument.lat, lng: monument.lng, altitude: 1.15 }, 900);
       state.globe.ringsData([monument]);
-      try { state.globe.controls().autoRotate = false; } catch (_) {}
     } else if (state.fallbackProjection) {
       state.fallbackProjection(monument.lat, monument.lng, monument.id);
     }
@@ -162,13 +182,29 @@
       return { monument, point };
     });
 
-    function project(centerLat = 12, centerLng = 8, selectedId = "") {
-      const lat0 = centerLat * Math.PI / 180;
-      sphere.style.setProperty("--fallback-x", `${50 - centerLng / 3.6}%`);
-      sphere.style.setProperty("--fallback-y", `${50 + centerLat / 3.6}%`);
+    const view = {
+      centerLat: 12,
+      centerLng: 8,
+      selectedId: "",
+      dragging: false,
+      lastX: 0,
+      lastY: 0,
+      lastFrame: performance.now(),
+      lastRender: 0,
+    };
+    state.fallback = view;
+
+    function project(centerLat = view.centerLat, centerLng = view.centerLng, selectedId = view.selectedId) {
+      view.centerLat = Math.max(-72, Math.min(72, centerLat));
+      view.centerLng = ((centerLng + 540) % 360) - 180;
+      view.selectedId = selectedId;
+      const lat0 = view.centerLat * Math.PI / 180;
+      sphere.style.setProperty("--fallback-x", `${50 - view.centerLng / 3.6}%`);
+      sphere.style.setProperty("--fallback-y", `${50 + view.centerLat / 3.6}%`);
+      els.globe.dataset.viewLng = view.centerLng.toFixed(3);
       pointNodes.forEach(({ monument, point }) => {
         const lat = monument.lat * Math.PI / 180;
-        const delta = (monument.lng - centerLng) * Math.PI / 180;
+        const delta = (monument.lng - view.centerLng) * Math.PI / 180;
         const x = Math.cos(lat) * Math.sin(delta);
         const y = Math.cos(lat0) * Math.sin(lat) - Math.sin(lat0) * Math.cos(lat) * Math.cos(delta);
         const z = Math.sin(lat0) * Math.sin(lat) + Math.cos(lat0) * Math.cos(lat) * Math.cos(delta);
@@ -180,11 +216,48 @@
       });
     }
 
+    const finishDrag = (event) => {
+      if (!view.dragging) return;
+      view.dragging = false;
+      if (sphere.hasPointerCapture(event.pointerId)) sphere.releasePointerCapture(event.pointerId);
+    };
+
+    sphere.addEventListener("pointerdown", (event) => {
+      if (event.target.closest(".fallback-point")) return;
+      view.dragging = true;
+      view.lastX = event.clientX;
+      view.lastY = event.clientY;
+      sphere.setPointerCapture(event.pointerId);
+    });
+    sphere.addEventListener("pointermove", (event) => {
+      if (!view.dragging) return;
+      const deltaX = event.clientX - view.lastX;
+      const deltaY = event.clientY - view.lastY;
+      view.lastX = event.clientX;
+      view.lastY = event.clientY;
+      project(view.centerLat + deltaY * 0.22, view.centerLng - deltaX * 0.32);
+    });
+    sphere.addEventListener("pointerup", finishDrag);
+    sphere.addEventListener("pointercancel", finishDrag);
+
+    function animate(now) {
+      const elapsed = Math.min(50, now - view.lastFrame);
+      view.lastFrame = now;
+      if (state.rotationEnabled && !view.dragging) view.centerLng += elapsed * 0.0045;
+      if (now - view.lastRender > 32) {
+        project();
+        view.lastRender = now;
+      }
+      requestAnimationFrame(animate);
+    }
+
     state.fallbackProjection = project;
     sphere.append(points);
     wrap.append(sphere, status);
     els.globe.append(wrap);
     project();
+    requestAnimationFrame(animate);
+    setRotation(state.rotationEnabled);
     els.loading.classList.add("is-ready");
   }
 
@@ -237,7 +310,7 @@
       state.globe = globe;
       els.globe.dataset.pointCount = String(state.monuments.length);
       const controls = globe.controls();
-      controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      controls.autoRotate = state.rotationEnabled;
       controls.autoRotateSpeed = 0.35;
       controls.enablePan = false;
       controls.minDistance = 150;
@@ -250,7 +323,11 @@
       };
       new ResizeObserver(size).observe(els.stage);
       size();
-      els.stage.addEventListener("pointerdown", () => { controls.autoRotate = false; }, { passive: true });
+      controls.addEventListener("change", () => {
+        const view = globe.pointOfView();
+        els.globe.dataset.viewLng = Number(view.lng).toFixed(3);
+      });
+      setRotation(state.rotationEnabled);
     } catch (error) {
       state.globe = null;
       initFallback(error);
@@ -258,6 +335,7 @@
   }
 
   function bindEvents() {
+    els.rotation?.addEventListener("click", () => setRotation(!state.rotationEnabled));
     els.search.addEventListener("input", renderResults);
     els.search.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && state.matches.length) {

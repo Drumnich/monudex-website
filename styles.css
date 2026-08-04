@@ -231,8 +231,12 @@ input:focus-visible {
   border: 1px solid rgba(104, 223, 184, 0.28);
   border-radius: 50%;
   box-shadow: inset -48px -22px 90px rgba(0, 0, 0, 0.82), inset 18px 8px 34px rgba(255, 255, 255, 0.10), 0 0 66px rgba(14, 159, 110, 0.17);
-  transition: background-position 500ms ease;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
+
+.fallback-sphere:active { cursor: grabbing; }
 
 .fallback-sphere::after {
   content: "";
@@ -257,7 +261,7 @@ input:focus-visible {
   transform: translate(-50%, -50%);
   box-shadow: 0 0 5px rgba(24, 210, 148, 0.82);
   cursor: pointer;
-  transition: left 500ms ease, top 500ms ease, opacity 500ms ease, transform 160ms ease;
+  transition: transform 160ms ease;
 }
 
 .fallback-point:hover,
@@ -541,11 +545,17 @@ input:focus-visible {
 .hero-stats strong { font-size: 22px; font-weight: 900; }
 .hero-stats span { margin-top: 2px; color: #7F878C; font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
-.globe-instruction {
+.globe-controls {
   position: absolute;
   right: 22px;
   bottom: 20px;
   z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.globe-instruction {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -560,6 +570,23 @@ input:focus-visible {
 }
 
 .globe-instruction svg { width: 15px; height: 15px; color: var(--accent); }
+
+.globe-rotation {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #FFFFFF;
+  background: rgba(16, 19, 21, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.globe-rotation:hover,
+.globe-rotation:focus-visible { color: var(--accent); border-color: rgba(24, 210, 148, 0.55); }
+.globe-rotation svg { width: 16px; height: 16px; }
 
 .place-popover {
   position: absolute;
@@ -1354,7 +1381,7 @@ noscript { display: block; padding: 16px; color: #FFFFFF; background: var(--dang
   .hero-stats { margin-top: 16px; }
   .hero-stats > div { min-width: 96px; padding-top: 12px; }
   .hero-stats strong { font-size: 19px; }
-  .globe-instruction { right: 50%; bottom: 14px; transform: translateX(50%); white-space: nowrap; }
+  .globe-controls { right: 50%; bottom: 14px; transform: translateX(50%); white-space: nowrap; }
 
   .place-popover {
     top: auto;
