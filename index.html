@@ -66,6 +66,23 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
 [data-fchip][data-on="1"]{background:var(--accent) !important;color:#fff !important;border-color:transparent !important}
 [data-faq][data-open="1"] [data-chev]{transform:rotate(180deg)}
 ::selection{background:var(--accent);color:#fff}
+@media (max-width:760px){
+  body{overflow-x:hidden}
+  [data-page]{overflow-x:hidden !important}
+  nav{height:auto !important;min-height:58px !important;align-items:flex-start !important;flex-wrap:wrap !important;gap:8px !important;padding:9px 10px !important;border-radius:18px !important}
+  [data-nav]{order:3 !important;width:100% !important;margin:2px 0 0 !important;display:flex !important;justify-content:flex-start !important;gap:4px !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  [data-nav]::-webkit-scrollbar{display:none}
+  [data-nav] a{flex:0 0 auto !important;text-align:center !important;font-size:12.5px !important;line-height:1 !important;padding:8px 10px !important;white-space:nowrap !important}
+  [data-rating]{display:none !important}
+  nav>div:last-child{margin-left:auto !important;gap:6px !important}
+  nav>div:last-child>a{width:42px !important;height:40px !important;min-width:42px !important;justify-content:center !important;padding:0 !important;font-size:0 !important}
+  nav>div:last-child>a svg{width:16px !important;height:16px !important}
+  [data-stack]{display:block !important}
+  [data-statrow]{gap:16px !important}
+}
+@media (max-width:430px){
+  [data-dir]>div[style*="position:fixed"]{left:16px !important;right:16px !important;justify-content:space-between !important}
+}
 </style>
 </helmet>
 
@@ -81,23 +98,23 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
   <!-- nav -->
   <div style="position:sticky;top:14px;z-index:100;padding:0 16px;margin-top:14px">
     <nav style="max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;height:68px;padding:0 14px 0 17px;border-radius:20px;background:var(--nav-bg);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--nav-line);box-shadow:var(--shadow-sm),inset 0 1px 0 var(--nav-hi)">
-      <a onClick="{{ goHome }}" style="display:flex;align-items:center;cursor:pointer;text-decoration:none;color:var(--ink);flex:0 0 auto">
+      <a href="#home" onClick="{{ goHome }}" style="display:flex;align-items:center;cursor:pointer;text-decoration:none;color:var(--ink);flex:0 0 auto">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:.78;letter-spacing:1.2px;display:flex;flex-direction:column">
           <span style="color:var(--ink)">MONU</span>
           <span style="color:var(--accent)">DEX</span>
         </span>
       </a>
       <div data-nav style="display:flex;gap:3px;margin:0 auto;padding:5px;border-radius:14px;background:var(--nav-inset);border:1px solid var(--nav-line)">
-        <a onClick="{{ goHome }}" data-route="home" style="cursor:pointer;text-decoration:none;font-weight:700;font-size:14px;padding:8px 16px;border-radius:10px;color:var(--ink2)">Home</a>
-        <a onClick="{{ goExplore }}" data-route="explore" style="cursor:pointer;text-decoration:none;font-weight:700;font-size:14px;padding:8px 16px;border-radius:10px;color:var(--ink2)">Explore</a>
-        <a onClick="{{ goHow }}" data-route="how" style="cursor:pointer;text-decoration:none;font-weight:700;font-size:14px;padding:8px 16px;border-radius:10px;color:var(--ink2)">How it works</a>
+        <a href="#home" onClick="{{ goHome }}" data-route="home" style="cursor:pointer;text-decoration:none;font-weight:700;font-size:14px;padding:8px 16px;border-radius:10px;color:var(--ink2)">Home</a>
+        <a href="#explore" onClick="{{ goExplore }}" data-route="explore" style="cursor:pointer;text-decoration:none;font-weight:700;font-size:14px;padding:8px 16px;border-radius:10px;color:var(--ink2)">Explore</a>
+        <a href="#how" onClick="{{ goHow }}" data-route="how" style="cursor:pointer;text-decoration:none;font-weight:700;font-size:14px;padding:8px 16px;border-radius:10px;color:var(--ink2)">How it works</a>
       </div>
       <div style="display:flex;align-items:center;gap:13px;flex:0 0 auto">
         <div style="display:flex;align-items:center;gap:6px" data-rating>
           <span style="color:#F2B84B;font-size:12px;letter-spacing:1px">★★★★★</span>
           <span style="font-weight:800;font-size:13px;color:var(--ink)">4.9</span>
         </div>
-        <a onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14.5px;padding:12px 20px;border-radius:13px;background:var(--accent);color:var(--on-accent);box-shadow:0 8px 22px var(--accent-soft),inset 0 1px 0 rgba(255,255,255,.25);white-space:nowrap">
+        <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14.5px;padding:12px 20px;border-radius:13px;background:var(--accent);color:var(--on-accent);box-shadow:0 8px 22px var(--accent-soft),inset 0 1px 0 rgba(255,255,255,.25);white-space:nowrap">
           <svg width="15" height="15" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-37 16.6-65 50.5-86-19-27-47.5-42-85-45-36-3-75 21-89 21-14 0-47-20-72-20-37 .5-71 21.5-90 55-39 67-10 166 28 220 19 27 41 57 70 56 28-1 39-18 73-18 33 0 43 18 72 17 30-.5 49-27 67-54 21-31 30-61 30-63-.5-.5-58-22-58-86z M262 86c15-18 25-43 22-68-21 1-47 14-62 32-14 16-26 41-23 65 23 2 46-12 63-29z"/></svg>
           Get the app
         </a>
@@ -107,7 +124,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
 
   <!-- ============ HOME ============ -->
   <sc-if value="{{ pageHome }}" hint-placeholder-val="{{ true }}">
-  <div>
+  <div id="home">
 
     <!-- HERO: Atlas -->
     <sc-if value="{{ dirA }}" hint-placeholder-val="{{ true }}">
@@ -120,8 +137,8 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
             <h1 style="font-family:var(--display);font-weight:700;font-size:clamp(40px,5.4vw,68px);line-height:1.02;letter-spacing:-.03em;margin:22px 0 0;color:var(--ink)">Collect the <span style="color:var(--accent)">world</span>, one landmark at a time.</h1>
             <p style="color:var(--ink2);font-size:19px;line-height:1.55;max-width:40ch;margin:20px 0 28px">Turn every trip into a collection. Discover iconic monuments, prove you were really there, and build your personal atlas of the planet.</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap">
-              <a onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:14px;background:var(--accent);color:#fff">Get the app</a>
-              <a onClick="{{ goExplore }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink)">Explore the globe →</a>
+              <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:14px;background:var(--accent);color:#fff">Get the app</a>
+              <a href="#explore" onClick="{{ goExplore }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink)">Explore the globe →</a>
             </div>
             <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px;font-weight:600;margin-top:22px"><span style="color:#E6A93B;letter-spacing:2px;font-size:14px">★★★★★</span>Loved by travelers in 195 countries</div>
           </div>
@@ -154,8 +171,8 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
           <div ref="{{ heroB }}" style="position:relative;width:100%;max-width:640px;height:520px"></div>
         </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px">
-          <a onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--accent);color:#06140d;box-shadow:0 0 0 1px rgba(27,227,154,.5),0 14px 36px rgba(27,227,154,.34)">Download for iOS</a>
-          <a onClick="{{ goExplore }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff">Open the globe →</a>
+          <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--accent);color:#06140d;box-shadow:0 0 0 1px rgba(27,227,154,.5),0 14px 36px rgba(27,227,154,.34)">Download for iOS</a>
+          <a href="#explore" onClick="{{ goExplore }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff">Open the globe →</a>
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:34px;font-family:var(--mono)" data-statrow>
           <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px 22px;min-width:120px"><div style="font-size:30px;font-weight:700;color:#fff">{{ counts.m }}</div><div style="color:#8af0c4;font-size:11px;font-weight:700;letter-spacing:.1em;margin-top:3px">MONUMENTS</div></div>
@@ -204,7 +221,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
           <div style="width:50px;height:50px;border-radius:14px;background:var(--accent-soft);display:grid;place-items:center;margin:14px 0 16px">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-d)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
           <h3 style="font-size:20px;font-weight:800;margin:0 0 8px">Visit &amp; verify</h3>
-          <p style="font-size:15px;color:var(--ink2);margin:0">Get within range and snap a selfie. MonuDex confirms the landmark is really in frame — no faking it.</p>
+          <p style="font-size:15px;color:var(--ink2);margin:0">Get within roughly 2 km and snap a selfie. MonuDex confirms the landmark is really in frame — no faking it.</p>
         </div>
         <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm)">
           <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)">03</div>
@@ -223,7 +240,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
           <div style="font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">Bucket list</div>
           <h2 style="font-family:var(--display);font-weight:var(--display-weight);font-size:clamp(30px,4vw,46px);letter-spacing:-.02em;margin:12px 0 0">Featured monuments</h2>
         </div>
-        <a onClick="{{ goExplore }}" style="cursor:pointer;font-weight:800;color:var(--accent);font-size:15px">See all 585 →</a>
+        <a href="#explore" onClick="{{ goExplore }}" style="cursor:pointer;font-weight:800;color:var(--accent);font-size:15px">See all 585 →</a>
       </div>
       <div data-rv style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px" data-grid4>
         <sc-for list="{{ featured }}" as="m" hint-placeholder-count="8">
@@ -354,13 +371,13 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
     </section>
 
     <!-- CTA -->
-    <section style="max-width:1200px;margin:0 auto;padding:30px 16px 90px">
+    <section id="download" style="max-width:1200px;margin:0 auto;padding:30px 16px 90px">
       <div data-rv style="background:var(--accent-soft);border:1px solid var(--line);color:var(--ink);border-radius:var(--radius-lg);padding:60px 40px;text-align:center;position:relative;overflow:hidden">
         <h2 style="position:relative;font-family:var(--display);font-weight:var(--display-weight);font-size:clamp(30px,4vw,48px);letter-spacing:-.02em;margin:0">Your next adventure is waiting</h2>
         <p style="position:relative;color:var(--ink2);max-width:48ch;margin:16px auto 28px;font-size:18px">Start your collection today and turn every trip into a story worth keeping.</p>
         <div style="position:relative;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-          <a onClick="{{ goGet }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--accent);color:#fff">Download for iOS</a>
-          <a onClick="{{ goExplore }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink)">Explore the globe</a>
+          <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--accent);color:#fff">Download for iOS</a>
+          <a href="#explore" onClick="{{ goExplore }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink)">Explore the globe</a>
         </div>
       </div>
     </section>
@@ -370,7 +387,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
 
   <!-- ============ EXPLORE ============ -->
   <sc-if value="{{ pageExplore }}" hint-placeholder-val="{{ true }}">
-  <section style="display:flex;flex-wrap:wrap;align-items:flex-start" data-explore>
+  <section id="explore" style="display:flex;flex-wrap:wrap;align-items:flex-start" data-explore>
     <div style="flex:1 1 460px;position:sticky;top:90px;height:calc(100vh - 106px);min-height:460px;background:radial-gradient(900px 620px at 50% 32%,#11203a,#05070f);overflow:hidden">
       <div ref="{{ exploreEl }}" style="position:absolute;inset:0;width:100%;height:100%"></div>
       <div style="position:absolute;left:24px;top:24px;pointer-events:none">
@@ -417,14 +434,14 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
 
   <!-- ============ HOW IT WORKS ============ -->
   <sc-if value="{{ pageHow }}" hint-placeholder-val="{{ true }}">
-  <div>
+  <div id="how">
     <section style="max-width:1200px;margin:0 auto;padding:60px 16px 20px">
       <div data-rv style="display:flex;flex-wrap:wrap;gap:40px;align-items:center">
         <div style="flex:1 1 420px">
           <div style="font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">How it works</div>
           <h1 style="font-family:var(--display);font-weight:var(--display-weight);font-size:clamp(36px,5vw,60px);line-height:1.04;letter-spacing:-.02em;margin:14px 0 0">From wanderlust to a world you own</h1>
           <p style="color:var(--ink2);font-size:19px;margin:18px 0 26px;max-width:46ch">MonuDex is a real-world collection game for travelers. Discover a landmark, prove you were really there, and watch your atlas of the planet fill in — one monument at a time.</p>
-          <a onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:999px;background:var(--accent);color:#fff;box-shadow:0 12px 30px rgba(14,159,110,.34)">Start collecting</a>
+          <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:999px;background:var(--accent);color:#fff;box-shadow:0 12px 30px rgba(14,159,110,.34)">Start collecting</a>
         </div>
         <div style="flex:1 1 360px;display:grid;place-items:center">
           <img src="assets/traveler.svg" alt="Travelers exploring the world with MonuDex" style="width:100%;max-width:440px;filter:drop-shadow(0 24px 40px rgba(16,20,24,.16))" />
@@ -440,7 +457,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:30px;box-shadow:var(--shadow-sm)">
           <div style="flex:0 0 auto;width:64px;height:64px;border-radius:18px;background:var(--accent-soft);display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:22px;color:var(--accent-d)">02</div>
-          <div style="flex:1 1 320px"><h3 style="font-size:23px;font-weight:800;margin:0 0 6px">Travel there &amp; verify</h3><p style="font-size:15.5px;color:var(--ink2);margin:0">Once you're within about 500m, capture a selfie. MonuDex confirms the landmark is actually in frame before it counts — so your collection is always earned.</p></div>
+          <div style="flex:1 1 320px"><h3 style="font-size:23px;font-weight:800;margin:0 0 6px">Travel there &amp; verify</h3><p style="font-size:15.5px;color:var(--ink2);margin:0">Once you're within about 2 km, capture a selfie. MonuDex confirms the landmark is actually in frame before it counts — so your collection is always earned.</p></div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:30px;box-shadow:var(--shadow-sm)">
           <div style="flex:0 0 auto;width:64px;height:64px;border-radius:18px;background:var(--accent-soft);display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:22px;color:var(--accent-d)">03</div>
@@ -526,8 +543,8 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
         <h2 style="position:relative;font-family:var(--display);font-weight:var(--display-weight);font-size:clamp(30px,4vw,48px);letter-spacing:-.02em;margin:0">Make your travels collectible</h2>
         <p style="position:relative;color:var(--ink2);max-width:48ch;margin:16px auto 28px;font-size:18px">585 monuments. 195 countries. One beautiful atlas you build with your own two feet.</p>
         <div style="position:relative;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-          <a onClick="{{ goGet }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--accent);color:#fff">Download for iOS</a>
-          <a onClick="{{ goExplore }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink)">Explore the globe</a>
+          <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--accent);color:#fff">Download for iOS</a>
+          <a href="#explore" onClick="{{ goExplore }}" style="cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 28px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink)">Explore the globe</a>
         </div>
       </div>
     </section>
@@ -536,7 +553,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
 
   <!-- ============ PRIVACY ============ -->
   <sc-if value="{{ pagePrivacy }}" hint-placeholder-val="{{ true }}">
-  <section style="max-width:820px;margin:0 auto;padding:54px 16px 60px">
+  <section id="privacy" style="max-width:820px;margin:0 auto;padding:54px 16px 60px">
     <div style="font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">Legal</div>
     <h1 style="font-family:var(--display);font-weight:var(--display-weight);font-size:clamp(34px,5vw,54px);letter-spacing:-.02em;margin:12px 0 6px">Privacy Policy</h1>
     <p style="color:var(--muted);font-size:14px;font-weight:600;margin:0 0 28px">Last updated June 2026 · MonuDex respects your journey and your data.</p>
@@ -546,14 +563,14 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
       <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">3. How we use it</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">Location and selfie checks confirm a landmark was really in frame so unlocks are genuine. Your progress powers your atlas, stats and streaks. That's it — no advertising profiles.</p></div>
       <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">4. What we never do</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">We never sell or rent your personal data; never publish or share your verification photos; and never read your location while the app is closed. Image checks run on-device wherever possible, so raw photos don't need to leave your phone.</p></div>
       <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">5. Your controls</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">You can export your full collection or delete your account and all associated data at any time from Settings. Deletion is permanent and processed within 30 days.</p></div>
-      <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">6. Contact</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">Questions about privacy? Reach us at <a onClick="{{ goContact }}" style="color:var(--accent-d);font-weight:700;cursor:pointer">our contact page</a> or privacy@monudex.app.</p></div>
+      <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">6. Contact</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">Questions about privacy? Reach us at <a href="#contact" onClick="{{ goContact }}" style="color:var(--accent-d);font-weight:700;cursor:pointer">our contact page</a> or privacy@monudex.app.</p></div>
     </div>
   </section>
   </sc-if>
 
   <!-- ============ TERMS ============ -->
   <sc-if value="{{ pageTerms }}" hint-placeholder-val="{{ true }}">
-  <section style="max-width:820px;margin:0 auto;padding:54px 16px 60px">
+  <section id="terms" style="max-width:820px;margin:0 auto;padding:54px 16px 60px">
     <div style="font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">Legal</div>
     <h1 style="font-family:var(--display);font-weight:var(--display-weight);font-size:clamp(34px,5vw,54px);letter-spacing:-.02em;margin:12px 0 6px">Terms of Service</h1>
     <p style="color:var(--muted);font-size:14px;font-weight:600;margin:0 0 28px">Last updated June 2026 · Please read these terms before collecting.</p>
@@ -563,14 +580,14 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
       <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">3. Fair play</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">Unlocks must be earned by genuinely visiting a monument. Spoofing location, submitting photos you didn't capture on-site, or otherwise circumventing verification is prohibited and may result in removed unlocks or account suspension.</p></div>
       <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">4. Your content</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">You keep ownership of the selfies and content you create. You grant MonuDex only the limited permission needed to run verification and display your own collection back to you.</p></div>
       <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">5. Safety &amp; conduct</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">Always follow local laws, site rules, and common sense when visiting monuments. Never trespass or put yourself in danger for a collection — no landmark is worth it.</p></div>
-      <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">6. Changes &amp; contact</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">We may update these terms; we'll flag material changes in-app. Questions? Visit <a onClick="{{ goContact }}" style="color:var(--accent-d);font-weight:700;cursor:pointer">our contact page</a> or email legal@monudex.app.</p></div>
+      <div><h2 style="font-size:19px;font-weight:800;margin:0 0 8px;color:var(--ink)">6. Changes &amp; contact</h2><p style="color:var(--ink2);font-size:15.5px;line-height:1.65;margin:0">We may update these terms; we'll flag material changes in-app. Questions? Visit <a href="#contact" onClick="{{ goContact }}" style="color:var(--accent-d);font-weight:700;cursor:pointer">our contact page</a> or email legal@monudex.app.</p></div>
     </div>
   </section>
   </sc-if>
 
   <!-- ============ CONTACT ============ -->
   <sc-if value="{{ pageContact }}" hint-placeholder-val="{{ true }}">
-  <section style="max-width:1000px;margin:0 auto;padding:54px 16px 60px">
+  <section id="contact" style="max-width:1000px;margin:0 auto;padding:54px 16px 60px">
     <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
       <div style="flex:1 1 340px">
         <div style="font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">Get in touch</div>
@@ -613,25 +630,25 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
   <footer style="border-top:1px solid var(--line);background:var(--surface2)">
     <div style="max-width:1200px;margin:0 auto;padding:52px 16px 28px;display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between">
       <div style="flex:1 1 280px;max-width:340px">
-        <a onClick="{{ goHome }}" style="display:flex;align-items:center;cursor:pointer;color:var(--ink)"><span style="font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:.78;letter-spacing:1.4px;display:flex;flex-direction:column"><span style="color:var(--ink)">MONU</span><span style="color:var(--accent)">DEX</span></span></a>
+        <a href="#home" onClick="{{ goHome }}" style="display:flex;align-items:center;cursor:pointer;color:var(--ink)"><span style="font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:.78;letter-spacing:1.4px;display:flex;flex-direction:column"><span style="color:var(--ink)">MONU</span><span style="color:var(--accent)">DEX</span></span></a>
         <p style="color:var(--ink2);font-size:14px;line-height:1.6;margin:14px 0 16px">The real-world collection game. Travel, verify, and build your personal atlas of the planet — 585 monuments across 195 countries.</p>
-        <a onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14px;padding:11px 18px;border-radius:12px;background:var(--accent);color:var(--on-accent)"><svg width="14" height="14" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-37 16.6-65 50.5-86-19-27-47.5-42-85-45-36-3-75 21-89 21-14 0-47-20-72-20-37 .5-71 21.5-90 55-39 67-10 166 28 220 19 27 41 57 70 56 28-1 39-18 73-18 33 0 43 18 72 17 30-.5 49-27 67-54 21-31 30-61 30-63-.5-.5-58-22-58-86z M262 86c15-18 25-43 22-68-21 1-47 14-62 32-14 16-26 41-23 65 23 2 46-12 63-29z"/></svg>Get the app</a>
+        <a href="#download" onClick="{{ goGet }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14px;padding:11px 18px;border-radius:12px;background:var(--accent);color:var(--on-accent)"><svg width="14" height="14" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-37 16.6-65 50.5-86-19-27-47.5-42-85-45-36-3-75 21-89 21-14 0-47-20-72-20-37 .5-71 21.5-90 55-39 67-10 166 28 220 19 27 41 57 70 56 28-1 39-18 73-18 33 0 43 18 72 17 30-.5 49-27 67-54 21-31 30-61 30-63-.5-.5-58-22-58-86z M262 86c15-18 25-43 22-68-21 1-47 14-62 32-14 16-26 41-23 65 23 2 46-12 63-29z"/></svg>Get the app</a>
       </div>
       <div style="display:flex;gap:56px;flex-wrap:wrap">
         <div>
           <div style="font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Product</div>
           <div style="display:flex;flex-direction:column;gap:11px;font-weight:600;font-size:14.5px">
-            <a onClick="{{ goHome }}" style="cursor:pointer;color:var(--ink2)">Home</a>
-            <a onClick="{{ goExplore }}" style="cursor:pointer;color:var(--ink2)">Explore the globe</a>
-            <a onClick="{{ goHow }}" style="cursor:pointer;color:var(--ink2)">How it works</a>
+            <a href="#home" onClick="{{ goHome }}" style="cursor:pointer;color:var(--ink2)">Home</a>
+            <a href="#explore" onClick="{{ goExplore }}" style="cursor:pointer;color:var(--ink2)">Explore the globe</a>
+            <a href="#how" onClick="{{ goHow }}" style="cursor:pointer;color:var(--ink2)">How it works</a>
           </div>
         </div>
         <div>
           <div style="font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Company</div>
           <div style="display:flex;flex-direction:column;gap:11px;font-weight:600;font-size:14.5px">
-            <a onClick="{{ goContact }}" style="cursor:pointer;color:var(--ink2)">Contact</a>
-            <a onClick="{{ goPrivacy }}" style="cursor:pointer;color:var(--ink2)">Privacy Policy</a>
-            <a onClick="{{ goTerms }}" style="cursor:pointer;color:var(--ink2)">Terms of Service</a>
+            <a href="#contact" onClick="{{ goContact }}" style="cursor:pointer;color:var(--ink2)">Contact</a>
+            <a href="#privacy" onClick="{{ goPrivacy }}" style="cursor:pointer;color:var(--ink2)">Privacy Policy</a>
+            <a href="#terms" onClick="{{ goTerms }}" style="cursor:pointer;color:var(--ink2)">Terms of Service</a>
           </div>
         </div>
       </div>
@@ -639,7 +656,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
     <div style="max-width:1200px;margin:0 auto;padding:18px 16px 40px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center">
       <div style="color:var(--muted);font-size:13px">© 2026 MonuDex · Photos via Wikimedia Commons</div>
       <div style="display:flex;gap:14px;align-items:center">
-        <a onClick="{{ goContact }}" style="cursor:pointer;color:var(--muted);font-size:13px;font-weight:600">hello@monudex.app</a>
+        <a href="#contact" onClick="{{ goContact }}" style="cursor:pointer;color:var(--muted);font-size:13px;font-weight:600">hello@monudex.app</a>
         <span style="color:var(--muted);font-size:13px">·</span>
         <span style="color:var(--muted);font-size:13px;font-weight:600">@monudex</span>
       </div>
@@ -652,7 +669,7 @@ body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibili
   <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(7,11,22,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)">
     <div onClick="{{ stop }}" style="background:var(--surface);color:var(--ink);border-radius:24px;overflow:hidden;max-width:460px;width:100%;box-shadow:0 30px 90px rgba(0,0,0,.5);animation:md-pop .3s cubic-bezier(.2,.8,.2,1);border:1px solid var(--line)">
       <div style="height:250px;background-image:{{ modal.bg }};background-size:cover;background-position:center;position:relative;background-color:#dde3e7">
-        <button onClick="{{ closeModal }}" style="position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.94);color:#0E1113;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.25)">✕</button>
+        <button aria-label="Close monument details" onClick="{{ closeModal }}" style="position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.94);color:#0E1113;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.25)">✕</button>
         <span style="position:absolute;left:16px;bottom:14px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:6px 12px;border-radius:999px;color:{{ modal.rarFg }};background:{{ modal.rarBg }};border:1px solid {{ modal.rarBorder }};-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)">{{ modal.rarDot }}{{ modal.rarity }}</span>
       </div>
       <div style="padding:22px 24px 26px">
@@ -694,7 +711,7 @@ class Component extends DCLogic {
       ['How does verification work?','You travel to the monument, get within range, and snap a selfie. MonuDex confirms the landmark is actually in frame before unlocking it — so every monument in your atlas is one you genuinely visited.'],
       ['Is MonuDex free?','Yes — discovering monuments, spinning the globe, and collecting are free. A future Premium tier adds offline maps, extra stats, and an ad-free experience.'],
       ['How many monuments are there?','585 curated monuments across 195 countries and 6 continents — from world wonders like the Taj Mahal to local icons you might not expect.'],
-      ['What counts as “within range”?','About 500 metres from the monument — close enough that the landmark is clearly visible in your selfie when you verify.'],
+      ['What counts as “within range”?','Within roughly 2 km of the monument — close enough that the landmark should be visible in your selfie when you verify.'],
       ['Do you store my photos or location?','Verification happens on-device where possible, and your selfies are never shared. Location is used only to confirm a visit — never sold or tracked in the background.']
     ];
   }
