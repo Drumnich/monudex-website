@@ -23,13 +23,34 @@
     fallback: null,
     rotationEnabled: true,
     globeInteracting: false,
-    cameraTransitionUntil: 0,
     orbitFrame: null,
     cloudLayer: null,
+    stageVisible: true,
+    renderProfile: null,
   };
 
   const refreshIcons = () => window.MonuDexSite?.refreshIcons();
   const { categoryLabel, searchableText, loadMonuments, fetchHistory } = window.MonuDexData;
+  const globeTextureUrl = () => state.renderProfile?.tier === "efficient"
+    ? "assets/globe/earth-blue-marble-2k.jpg"
+    : "assets/earth-blue-marble.jpg";
+
+  function getRenderProfile() {
+    const narrowScreen = window.matchMedia("(max-width: 760px)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = navigator.connection?.saveData === true;
+    const lowMemory = Number(navigator.deviceMemory || 8) <= 4;
+    const fewCores = Number(navigator.hardwareConcurrency || 8) <= 4;
+    const constrained = saveData || lowMemory || fewCores;
+    const maxPixelRatio = constrained || narrowScreen ? 1 : 1.35;
+
+    return {
+      advancedTextures: !constrained && !narrowScreen,
+      pixelRatio: Math.min(Number(window.devicePixelRatio || 1), maxPixelRatio),
+      reducedMotion,
+      tier: constrained || narrowScreen ? "efficient" : "balanced",
+    };
+  }
 
   function updateRotationControl() {
     if (!els.rotation) return;
@@ -44,9 +65,43 @@
 
   function setRotation(enabled) {
     state.rotationEnabled = enabled;
-    if (state.globe) state.globe.controls().autoRotate = false;
+    sync3DAnimationState();
     els.globe.dataset.rotating = String(enabled);
     updateRotationControl();
+  }
+
+  function stopCloudOrbit() {
+    cancelAnimationFrame(state.orbitFrame);
+    state.orbitFrame = null;
+  }
+
+  function startCloudOrbit() {
+    if (state.orbitFrame || !state.cloudLayer) return;
+    let lastFrame = performance.now();
+
+    function orbit(now) {
+      const elapsed = Math.min(50, now - lastFrame);
+      lastFrame = now;
+      state.cloudLayer.rotation.y -= elapsed * 0.000006;
+      state.orbitFrame = requestAnimationFrame(orbit);
+    }
+
+    state.orbitFrame = requestAnimationFrame(orbit);
+  }
+
+  function sync3DAnimationState() {
+    if (!state.globe) return;
+    const active = state.stageVisible && !document.hidden;
+    const shouldRotate = active && state.rotationEnabled && !state.globeInteracting;
+    const controls = state.globe.controls();
+    els.globe.dataset.animationActive = String(active);
+    controls.autoRotate = shouldRotate;
+
+    if (active) state.globe.resumeAnimation?.();
+    else state.globe.pauseAnimation?.();
+
+    if (shouldRotate && state.cloudLayer) startCloudOrbit();
+    else stopCloudOrbit();
   }
 
   async function fillHistory(monument, requestId) {
@@ -95,7 +150,6 @@
     els.search.value = monument.name;
 
     if (state.globe) {
-      state.cameraTransitionUntil = performance.now() + 950;
       state.globe.pointOfView({ lat: monument.lat, lng: monument.lng, altitude: 1.15 }, 900);
       state.globe.ringsData([monument]);
     } else if (state.fallbackProjection) {
@@ -192,6 +246,7 @@
       lastY: 0,
       lastFrame: performance.now(),
       lastRender: 0,
+      renderFrame: null,
       texture: null,
     };
     state.fallback = view;
@@ -264,7 +319,7 @@
       };
       drawSphere();
     }, { once: true });
-    textureImage.src = "assets/earth-blue-marble.jpg";
+    textureImage.src = globeTextureUrl();
 
     function project(centerLat = view.centerLat, centerLng = view.centerLng, selectedId = view.selectedId) {
       view.centerLat = Math.max(-72, Math.min(72, centerLat));
@@ -291,6 +346,14 @@
       });
     }
 
+    function scheduleProject() {
+      if (view.renderFrame) return;
+      view.renderFrame = requestAnimationFrame(() => {
+        view.renderFrame = null;
+        project();
+      });
+    }
+
     const finishDrag = (event) => {
       if (!view.dragging) return;
       view.dragging = false;
@@ -310,7 +373,9 @@
       const deltaY = event.clientY - view.lastY;
       view.lastX = event.clientX;
       view.lastY = event.clientY;
-      project(view.centerLat + deltaY * 0.22, view.centerLng - deltaX * 0.32);
+      view.centerLat = Math.max(-72, Math.min(72, view.centerLat + deltaY * 0.22));
+      view.centerLng = ((view.centerLng - deltaX * 0.32 + 540) % 360) - 180;
+      scheduleProject();
     });
     sphere.addEventListener("pointerup", finishDrag);
     sphere.addEventListener("pointercancel", finishDrag);
@@ -318,8 +383,9 @@
     function animate(now) {
       const elapsed = Math.min(50, now - view.lastFrame);
       view.lastFrame = now;
-      if (state.rotationEnabled && !view.dragging) view.centerLng += elapsed * 0.0022;
-      if (now - view.lastRender > 40) {
+      const shouldRotate = state.rotationEnabled && state.stageVisible && !document.hidden && !view.dragging;
+      if (shouldRotate) view.centerLng += elapsed * 0.0022;
+      if (shouldRotate && now - view.lastRender > 66) {
         project();
         view.lastRender = now;
       }
@@ -334,25 +400,6 @@
     requestAnimationFrame(animate);
     setRotation(state.rotationEnabled);
     els.loading.classList.add("is-ready");
-  }
-
-  function start3DOrbit(globe) {
-    let lastFrame = performance.now();
-    function orbit(now) {
-      const elapsed = Math.min(50, now - lastFrame);
-      lastFrame = now;
-      if (state.rotationEnabled && state.cloudLayer) {
-        state.cloudLayer.rotation.y -= elapsed * 0.000006;
-      }
-      if (state.rotationEnabled && !state.globeInteracting && now >= state.cameraTransitionUntil) {
-        const view = globe.pointOfView();
-        const lng = ((Number(view.lng) - elapsed * 0.0022 + 540) % 360) - 180;
-        globe.pointOfView({ lat: view.lat, lng, altitude: view.altitude }, 0);
-      }
-      state.orbitFrame = requestAnimationFrame(orbit);
-    }
-    cancelAnimationFrame(state.orbitFrame);
-    state.orbitFrame = requestAnimationFrame(orbit);
   }
 
   function loadThreeTexture(globe, url, TextureClass) {
@@ -375,22 +422,21 @@
     const TextureClass = surfaceMaterial.map?.constructor;
     if (!TextureClass) return;
 
-    const [normalTexture, specularTexture, cloudTexture] = await Promise.all([
-      loadThreeTexture(globe, "assets/globe/earth-normal.jpg", TextureClass).catch(() => null),
-      loadThreeTexture(globe, "assets/globe/earth-specular.jpg", TextureClass).catch(() => null),
-      loadThreeTexture(globe, "assets/globe/earth-clouds.png", TextureClass).catch(() => null),
+    const [specularTexture, cloudTexture] = await Promise.all([
+      state.renderProfile.advancedTextures
+        ? loadThreeTexture(globe, "assets/globe/earth-specular.jpg", TextureClass).catch(() => null)
+        : Promise.resolve(null),
+      state.renderProfile.advancedTextures
+        ? loadThreeTexture(globe, "assets/globe/earth-clouds.png", TextureClass).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
-    if (normalTexture) {
-      surfaceMaterial.normalMap = normalTexture;
-      surfaceMaterial.normalScale?.set(0.78, 0.78);
-    }
     if (specularTexture) {
       surfaceMaterial.specularMap = specularTexture;
       surfaceMaterial.specular?.set("#7EAFC4");
       surfaceMaterial.shininess = 22;
     }
-    surfaceMaterial.bumpScale = 4.5;
+    surfaceMaterial.bumpScale = 3.6;
     surfaceMaterial.needsUpdate = true;
 
     if (!cloudTexture || state.cloudLayer) return;
@@ -420,6 +466,7 @@
     surfaceMesh.parent.add(cloudLayer);
     state.cloudLayer = cloudLayer;
     els.globe.dataset.cloudLayer = "true";
+    sync3DAnimationState();
   }
 
   function init3DGlobe() {
@@ -430,8 +477,8 @@
 
     try {
       const globe = window.Globe({ animateIn: false })(els.globe)
-        .globeImageUrl("assets/earth-blue-marble.jpg")
-        .bumpImageUrl("assets/earth-topology.png")
+        .globeImageUrl(globeTextureUrl())
+        .bumpImageUrl(state.renderProfile.advancedTextures ? "assets/earth-topology.png" : null)
         .backgroundColor("rgba(0,0,0,0)")
         .showAtmosphere(true)
         .atmosphereColor("#79CFFF")
@@ -442,7 +489,7 @@
         .pointColor(() => "#18D294")
         .pointAltitude(0.006)
         .pointRadius(0.22)
-        .pointResolution(6)
+        .pointResolution(4)
         .pointsTransitionDuration(0)
         .pointLabel(() => "")
         .ringsData([])
@@ -472,27 +519,49 @@
 
       state.globe = globe;
       els.globe.dataset.pointCount = String(state.monuments.length);
+      els.globe.dataset.performanceTier = state.renderProfile.tier;
+      els.globe.dataset.renderPixelRatio = state.renderProfile.pixelRatio.toFixed(2);
       const controls = globe.controls();
       controls.autoRotate = false;
+      controls.autoRotateSpeed = 0.36;
       controls.enablePan = false;
       controls.minDistance = 150;
       controls.maxDistance = 520;
       globe.pointOfView({ lat: 18, lng: 10, altitude: 2.28 });
 
-      const size = () => {
+      globe.renderer().setPixelRatio(state.renderProfile.pixelRatio);
+      const applySize = () => {
         const rect = els.stage.getBoundingClientRect();
         if (rect.width > 0 && rect.height > 0) globe.width(rect.width).height(rect.height);
       };
+      let resizeFrame = null;
+      const size = () => {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(applySize);
+      };
       new ResizeObserver(size).observe(els.stage);
-      size();
-      controls.addEventListener("start", () => { state.globeInteracting = true; });
-      controls.addEventListener("end", () => { state.globeInteracting = false; });
-      controls.addEventListener("change", () => {
+      applySize();
+
+      const updateViewLongitude = () => {
         const view = globe.pointOfView();
         els.globe.dataset.viewLng = Number(view.lng).toFixed(3);
+      };
+      controls.addEventListener("start", () => {
+        state.globeInteracting = true;
+        sync3DAnimationState();
       });
+      controls.addEventListener("end", () => {
+        state.globeInteracting = false;
+        updateViewLongitude();
+        sync3DAnimationState();
+      });
+      new IntersectionObserver(([entry]) => {
+        state.stageVisible = entry.isIntersecting;
+        sync3DAnimationState();
+      }, { threshold: 0.01 }).observe(els.stage);
+      document.addEventListener("visibilitychange", sync3DAnimationState);
+      updateViewLongitude();
       setRotation(state.rotationEnabled);
-      start3DOrbit(globe);
     } catch (error) {
       state.globe = null;
       initFallback(error);
@@ -536,6 +605,8 @@
   async function init() {
     bindEvents();
     try {
+      state.renderProfile = getRenderProfile();
+      if (state.renderProfile.reducedMotion) state.rotationEnabled = false;
       state.monuments = await loadMonuments();
       init3DGlobe();
     } catch (error) {
