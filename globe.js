@@ -22,6 +22,9 @@
     fallbackProjection: null,
     fallback: null,
     rotationEnabled: true,
+    globeInteracting: false,
+    cameraTransitionUntil: 0,
+    orbitFrame: null,
   };
 
   const refreshIcons = () => window.MonuDexSite?.refreshIcons();
@@ -40,7 +43,7 @@
 
   function setRotation(enabled) {
     state.rotationEnabled = enabled;
-    if (state.globe) state.globe.controls().autoRotate = enabled;
+    if (state.globe) state.globe.controls().autoRotate = false;
     els.globe.dataset.rotating = String(enabled);
     updateRotationControl();
   }
@@ -91,6 +94,7 @@
     els.search.value = monument.name;
 
     if (state.globe) {
+      state.cameraTransitionUntil = performance.now() + 950;
       state.globe.pointOfView({ lat: monument.lat, lng: monument.lng, altitude: 1.15 }, 900);
       state.globe.ringsData([monument]);
     } else if (state.fallbackProjection) {
@@ -183,35 +187,28 @@
     });
 
     const view = {
-      centerLat: 12,
+      centerLat: 0,
       centerLng: 8,
       selectedId: "",
       dragging: false,
       lastX: 0,
-      lastY: 0,
       lastFrame: performance.now(),
       lastRender: 0,
     };
     state.fallback = view;
 
     function project(centerLat = view.centerLat, centerLng = view.centerLng, selectedId = view.selectedId) {
-      view.centerLat = Math.max(-72, Math.min(72, centerLat));
+      view.centerLat = 0;
       view.centerLng = ((centerLng + 540) % 360) - 180;
       view.selectedId = selectedId;
-      const lat0 = view.centerLat * Math.PI / 180;
-      sphere.style.setProperty("--fallback-x", `${50 - view.centerLng / 3.6}%`);
-      sphere.style.setProperty("--fallback-y", `${50 + view.centerLat / 3.6}%`);
+      sphere.style.setProperty("--fallback-x", `${50 + view.centerLng / 1.8}%`);
       els.globe.dataset.viewLng = view.centerLng.toFixed(3);
       pointNodes.forEach(({ monument, point }) => {
-        const lat = monument.lat * Math.PI / 180;
-        const delta = (monument.lng - view.centerLng) * Math.PI / 180;
-        const x = Math.cos(lat) * Math.sin(delta);
-        const y = Math.cos(lat0) * Math.sin(lat) - Math.sin(lat0) * Math.cos(lat) * Math.cos(delta);
-        const z = Math.sin(lat0) * Math.sin(lat) + Math.cos(lat0) * Math.cos(lat) * Math.cos(delta);
-        point.hidden = z < 0.02;
-        point.style.left = `${50 + x * 46}%`;
-        point.style.top = `${50 - y * 46}%`;
-        point.style.opacity = String(Math.max(0.42, z));
+        const delta = ((monument.lng - view.centerLng + 540) % 360) - 180;
+        point.hidden = Math.abs(delta) > 90;
+        point.style.left = `${50 + delta / 1.8}%`;
+        point.style.top = `${50 - monument.lat / 1.8}%`;
+        point.style.opacity = String(Math.max(0.42, Math.cos(delta * Math.PI / 180)));
         point.classList.toggle("is-selected", monument.id === selectedId);
       });
     }
@@ -226,16 +223,13 @@
       if (event.target.closest(".fallback-point")) return;
       view.dragging = true;
       view.lastX = event.clientX;
-      view.lastY = event.clientY;
       sphere.setPointerCapture(event.pointerId);
     });
     sphere.addEventListener("pointermove", (event) => {
       if (!view.dragging) return;
       const deltaX = event.clientX - view.lastX;
-      const deltaY = event.clientY - view.lastY;
       view.lastX = event.clientX;
-      view.lastY = event.clientY;
-      project(view.centerLat + deltaY * 0.22, view.centerLng - deltaX * 0.32);
+      project(0, view.centerLng - deltaX * 0.32);
     });
     sphere.addEventListener("pointerup", finishDrag);
     sphere.addEventListener("pointercancel", finishDrag);
@@ -261,6 +255,22 @@
     els.loading.classList.add("is-ready");
   }
 
+  function start3DOrbit(globe) {
+    let lastFrame = performance.now();
+    function orbit(now) {
+      const elapsed = Math.min(50, now - lastFrame);
+      lastFrame = now;
+      if (state.rotationEnabled && !state.globeInteracting && now >= state.cameraTransitionUntil) {
+        const view = globe.pointOfView();
+        const lng = ((Number(view.lng) - elapsed * 0.0022 + 540) % 360) - 180;
+        globe.pointOfView({ lat: view.lat, lng, altitude: view.altitude }, 0);
+      }
+      state.orbitFrame = requestAnimationFrame(orbit);
+    }
+    cancelAnimationFrame(state.orbitFrame);
+    state.orbitFrame = requestAnimationFrame(orbit);
+  }
+
   function init3DGlobe() {
     if (!window.Globe || !canUseWebGL()) {
       initFallback(!window.Globe ? "Globe runtime did not load" : "WebGL is not supported");
@@ -279,9 +289,10 @@
         .pointLat("lat")
         .pointLng("lng")
         .pointColor(() => "#18D294")
-        .pointAltitude(0.018)
-        .pointRadius(0.16)
-        .pointResolution(8)
+        .pointAltitude(0.004)
+        .pointRadius(0.22)
+        .pointResolution(6)
+        .pointsTransitionDuration(0)
         .pointLabel(() => "")
         .ringsData([])
         .ringLat("lat")
@@ -310,8 +321,7 @@
       state.globe = globe;
       els.globe.dataset.pointCount = String(state.monuments.length);
       const controls = globe.controls();
-      controls.autoRotate = state.rotationEnabled;
-      controls.autoRotateSpeed = 0.35;
+      controls.autoRotate = false;
       controls.enablePan = false;
       controls.minDistance = 150;
       controls.maxDistance = 520;
@@ -323,11 +333,14 @@
       };
       new ResizeObserver(size).observe(els.stage);
       size();
+      controls.addEventListener("start", () => { state.globeInteracting = true; });
+      controls.addEventListener("end", () => { state.globeInteracting = false; });
       controls.addEventListener("change", () => {
         const view = globe.pointOfView();
         els.globe.dataset.viewLng = Number(view.lng).toFixed(3);
       });
       setRotation(state.rotationEnabled);
+      start3DOrbit(globe);
     } catch (error) {
       state.globe = null;
       initFallback(error);

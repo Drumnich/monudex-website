@@ -218,7 +218,6 @@ input:focus-visible {
 
 .fallback-sphere {
   --fallback-x: 48%;
-  --fallback-y: 54%;
   position: relative;
   width: min(72vh, 72vw);
   max-width: 680px;
@@ -226,8 +225,9 @@ input:focus-visible {
   overflow: hidden;
   background-color: #082B45;
   background-image: url("assets/earth-blue-marble.jpg");
-  background-position: var(--fallback-x) var(--fallback-y);
-  background-size: auto 100%;
+  background-position: var(--fallback-x) center;
+  background-repeat: repeat-x;
+  background-size: 200% 100%;
   border: 1px solid rgba(104, 223, 184, 0.28);
   border-radius: 50%;
   box-shadow: inset -48px -22px 90px rgba(0, 0, 0, 0.82), inset 18px 8px 34px rgba(255, 255, 255, 0.10), 0 0 66px rgba(14, 159, 110, 0.17);
